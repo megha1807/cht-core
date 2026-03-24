@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
+import { PerformanceService } from '@mm-services/performance.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AndroidAppLauncherService {
   private resolve?: Function | null;
+  private tracking: ReturnType<PerformanceService['track']> | null = null;
 
-  constructor() { }
+  constructor(
+    private readonly performanceService: PerformanceService,
+  ) { }
 
   isEnabled() {
     return !!(
@@ -19,7 +23,8 @@ export class AndroidAppLauncherService {
     if (!this.resolve) {
       return;
     }
-
+this.tracking?.stop({ name: `enketo:external-app:${response['action']}` });
+    this.tracking = null;
     this.resolve(response);
     this.resolve = null;
   }
@@ -28,9 +33,11 @@ export class AndroidAppLauncherService {
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       try {
+        this.tracking = this.performanceService.track();
         this.executeLaunch(chtAndroidApp);
       } catch (error) {
         console.error('Error when launching Android app', error);
+        this.tracking = null;
         this.resolve = null;
         const details = `ChtAndroidApp=${JSON.stringify(chtAndroidApp)}, Enabled=${this.isEnabled()}`;
         const message = `AndroidAppLauncherService :: Error when launching Android app. ${details}`;

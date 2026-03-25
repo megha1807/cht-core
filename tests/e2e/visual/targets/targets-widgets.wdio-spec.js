@@ -27,7 +27,6 @@ describe('Targets widgets', () => {
   );
 
   const reports = [
-    // 10 basic pregnancies → populates "Active Pregnancies" count widget
     ...patients.slice(0, 10).map(patient =>
       pregnancyFactory.build({
         fields: {
@@ -38,7 +37,6 @@ describe('Targets widgets', () => {
       })
     ),
 
-    // 5 pregnancies with 0 ANC visits → contributes to percent widget
     ...patients.slice(10, 15).map(patient =>
       pregnancyFactory.build({
         fields: {
@@ -54,7 +52,6 @@ describe('Targets widgets', () => {
       })
     ),
 
-    // 2 pregnancies with 5 ANC visits → passes "4+ visits" percent goal
     ...patients.slice(15, 17).map(patient =>
       pregnancyFactory.build({
         fields: {
@@ -70,7 +67,6 @@ describe('Targets widgets', () => {
       })
     ),
 
-    // 2 pregnancy visits → populates visit count widget
     pregnancyVisitFactory.build({
       fields: {
         patient_id: patients[15]._id,
@@ -86,7 +82,6 @@ describe('Targets widgets', () => {
       },
     }),
 
-    // 2 facility deliveries
     deliveryFactory.build({
       fields: {
         patient_id: patients[1]._id,
@@ -102,7 +97,6 @@ describe('Targets widgets', () => {
       },
     }),
 
-    // 1 home delivery → shows "home vs facility" percent widget split
     deliveryFactory.build({
       fields: {
         patient_id: patients[3]._id,

@@ -171,7 +171,7 @@ export class TasksComponent implements OnInit, OnDestroy {
         ...this.getTaskLineage(subjects, task)
       }));
       this.tasksActions.setTasksList(tasksWithLineage);
-      this.telemetryService.record('tasks:visible-count', tasksWithLineage.length);
+      this.telemetryService.record('tasks:all-tasks', tasksWithLineage.length);
     } catch (exception) {
       console.error('Error getting tasks for all contacts', exception);
       this.errorStack = exception.stack;

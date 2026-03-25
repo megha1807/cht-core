@@ -297,7 +297,7 @@ describe('TasksComponent', () => {
   });
 
   expect(telemetryService.record.calledOnce).to.be.true;
-  expect(telemetryService.record.args[0]).to.deep.equal(['tasks:visible-count', 3]);
+  expect(telemetryService.record.args[0]).to.deep.equal(['tasks:all-tasks', 3]);
 });
 
   it('should should record telemetry on refresh', fakeAsync(async () => {

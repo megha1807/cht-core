@@ -284,21 +284,21 @@ describe('TasksComponent', () => {
   });
 
   it('should record telemetry with visible task count on recalculation', async () => {
-  const taskDocs = [
-    { _id: '1', emission: { _id: 'e1', owner: 'a' }, owner: 'a' },
-    { _id: '2', emission: { _id: 'e2', owner: 'b' }, owner: 'b' },
-    { _id: '3', emission: { _id: 'e3', owner: 'c' }, owner: 'c' },
-  ];
-  rulesEngineService.fetchTaskDocsForAllContacts.resolves(taskDocs);
+    const taskDocs = [
+      { _id: '1', emission: { _id: 'e1', owner: 'a' }, owner: 'a' },
+      { _id: '2', emission: { _id: 'e2', owner: 'b' }, owner: 'b' },
+      { _id: '3', emission: { _id: 'e3', owner: 'c' }, owner: 'c' },
+    ];
+    rulesEngineService.fetchTaskDocsForAllContacts.resolves(taskDocs);
 
-  await new Promise(resolve => {
-    sinon.stub(TasksActions.prototype, 'setTasksList').callsFake(resolve);
-    getComponent();
+    await new Promise(resolve => {
+      sinon.stub(TasksActions.prototype, 'setTasksList').callsFake(resolve);
+      getComponent();
+    });
+
+    expect(telemetryService.record.calledOnce).to.be.true;
+    expect(telemetryService.record.args[0]).to.deep.equal(['tasks:all-tasks', 3]);
   });
-
-  expect(telemetryService.record.calledOnce).to.be.true;
-  expect(telemetryService.record.args[0]).to.deep.equal(['tasks:all-tasks', 3]);
-});
 
   it('should should record telemetry on refresh', fakeAsync(async () => {
     sinon.stub(TasksActions.prototype, 'setTasksLoaded');

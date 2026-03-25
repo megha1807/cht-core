@@ -6,7 +6,7 @@ import { PerformanceService } from '@mm-services/performance.service';
 })
 export class AndroidAppLauncherService {
   private resolve?: Function | null;
-  private tracking: ReturnType<PerformanceService['track']> | null = null;
+  private stopTracking: (() => void) | undefined;
 
   constructor(
     private readonly performanceService: PerformanceService,
@@ -23,8 +23,8 @@ export class AndroidAppLauncherService {
     if (!this.resolve) {
       return;
     }
-this.tracking?.stop({ name: `enketo:external-app:${response['action']}` });
-    this.tracking = null;
+    this.stopTracking?.();
+    this.stopTracking = undefined;
     this.resolve(response);
     this.resolve = null;
   }
@@ -33,11 +33,12 @@ this.tracking?.stop({ name: `enketo:external-app:${response['action']}` });
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       try {
-        this.tracking = this.performanceService.track();
+        const tracking = this.performanceService.track();
+        this.stopTracking = () => tracking?.stop({ name: `enketo:external-app:${chtAndroidApp.action}` });
         this.executeLaunch(chtAndroidApp);
       } catch (error) {
         console.error('Error when launching Android app', error);
-        this.tracking = null;
+        this.stopTracking = undefined;
         this.resolve = null;
         const details = `ChtAndroidApp=${JSON.stringify(chtAndroidApp)}, Enabled=${this.isEnabled()}`;
         const message = `AndroidAppLauncherService :: Error when launching Android app. ${details}`;

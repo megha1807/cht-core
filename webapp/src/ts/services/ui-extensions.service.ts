@@ -15,7 +15,7 @@ interface UiExtensionProperties {
 
 interface UiExtension {
   readonly properties: UiExtensionProperties;
-  readonly Element: new () => HTMLElement;
+  readonly Element: any;
 }
 
 @Injectable({
@@ -23,26 +23,33 @@ interface UiExtension {
 })
 export class UiExtensionsService {
   private extensionProperties: UiExtensionProperties[] = [];
-  private extensionScripts: Record<string, new () => HTMLElement> = {};
-  private initialized = false;
+  private extensionScripts: Record<string, any> = {};
+  private initialized;
 
   constructor(
-    private readonly http: HttpClient,
-    private readonly sessionService: SessionService,
+    private http: HttpClient,
+    private sessionService: SessionService,
   ) { }
 
-  private async init() {
-    if (this.initialized) {
-      return;
+  isInitialized() {
+    if (!this.initialized) {
+      this.initialized = this.init();
     }
+    return this.initialized;
+  }
+
+  private async init() {
     await this.loadExtensionProperties();
-    this.initialized = true;
   }
 
   private async loadExtensionProperties() {
     try {
-      const request = this.http.get<UiExtensionProperties[]>('/ui-extension', { responseType: 'json' });
+      const request = this.http.get<UiExtensionProperties[]>('/api/v1/ui-extension', { responseType: 'json' });
       const extensions = await lastValueFrom(request);
+      if (!extensions?.length) {
+        return;
+      }
+      
       this.extensionProperties = extensions.filter(extension => {
         if (!extension.roles?.length) {
           return true;
@@ -55,36 +62,36 @@ export class UiExtensionsService {
   }
 
   private async loadExtensionScript(id: string) {
-    const request = this.http.get('/ui-extension/' + id, { responseType: 'text' });
-    const result = await lastValueFrom(request);
-    const module = { exports: null as any };
-    new Function('module', result)(module);
-    const Element = module.exports;
-    if (!Element || !(Element.prototype instanceof HTMLElement)) {
-      throw new Error(`Could not load UI Extension element with id [${id}].`);
+    try {
+      const request = this.http.get('/ui-extension/' + id, { responseType: 'text' });
+      const result = await lastValueFrom(request);
+      const module = { exports: null };
+      new Function('module', result)(module);
+      this.extensionScripts[id] = module.exports;
+    } catch (e) {
+      console.error(`Error loading UI extension script: "${id}"`, e);
     }
-    return Element as new () => HTMLElement;
   }
 
-  async getPropertiesByType(type: string): Promise<UiExtensionProperties[]> {
-    await this.init();
+  getPropertiesByType(type: string): UiExtensionProperties[] {
     return this.extensionProperties.filter(extension => extension.type === type);
   }
 
-  async getProperties(id: string): Promise<UiExtensionProperties> {
-    await this.init();
-    const props = this.extensionProperties.find(extension => extension.id === id);
-    if (!props) {
-      throw new Error(`UI Extension with id [${id}] not found.`);
-    }
-    return props;
+  
+  getProperties(id: string): UiExtensionProperties | undefined {
+    return this.extensionProperties.find(extension => extension.id === id);
   }
 
-  async getExtension(id: string): Promise<UiExtension> {
-    const properties = await this.getProperties(id);
+  async getExtension(id: string): Promise<UiExtension | undefined> {
+    await this.isInitialized();
+
+    const properties = this.getProperties(id);
+    if (!properties) {
+      return undefined;
+    }
 
     if (!this.extensionScripts[id]) {
-      this.extensionScripts[id] = await this.loadExtensionScript(id);
+      await this.loadExtensionScript(id);
     }
 
     return {

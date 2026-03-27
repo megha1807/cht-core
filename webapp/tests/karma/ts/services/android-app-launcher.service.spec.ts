@@ -171,6 +171,15 @@ describe('AndroidAppLauncherService', () => {
           expect(consoleErrorMock.callCount).to.equal(1);
           expect(consoleErrorMock.args[0][1].message).to.equal('some error');
           expect(medicMobileAndroid.launchExternalApp.callCount).to.equal(1);
+          expect(medicMobileAndroid.launchExternalApp.args[0]).to.have.members([
+            'com.my-app.action.LOCATE',
+            null,
+            null,
+            '{"id":"1","location":{"city":"Tokyo"}}',
+            null,
+            null,
+            null,
+          ]);
           expect(trackingStub.stop.callCount).to.equal(0);
         });
     });

@@ -15,7 +15,7 @@ interface UiExtensionProperties {
 
 interface UiExtension {
   readonly properties: UiExtensionProperties;
-  readonly Element: HtmlElement;
+  readonly Element: HTMLElement;
 }
 
 @Injectable({

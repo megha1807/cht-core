@@ -45,7 +45,7 @@ export class UiExtensionsTabComponent implements OnInit, AfterViewInit {
       const { properties, Element } = extension;
 
       if (!customElements.get(this.extensionId)) {
-        customElements.define(this.extensionId, Element as unknown as CustomElementConstructor);
+        customElements.define(this.extensionId, Element as any);
       }
       const element = document.createElement(this.extensionId);
 

@@ -26,6 +26,8 @@ import { PerformanceService } from '@mm-services/performance.service';
 import { ExportService } from '@mm-services/export.service';
 import { AuthService } from '@mm-services/auth.service';
 
+import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 describe('Messages Component', () => {
   let component: MessagesComponent;
   let fixture: ComponentFixture<MessagesComponent>;
@@ -75,6 +77,7 @@ describe('Messages Component', () => {
           MessagesMoreMenuComponent,
           FastActionButtonComponent,
           ToolBarComponent,
+          MatIconTestingModule,
         ],
         providers: [
           provideMockStore({ selectors: mockedSelectors }),
@@ -94,6 +97,9 @@ describe('Messages Component', () => {
       })
       .compileComponents()
       .then(() => {
+
+
+
         fixture = TestBed.createComponent(MessagesComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

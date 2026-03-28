@@ -17,6 +17,8 @@ import { SettingsService } from '@mm-services/settings.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { GlobalActions } from '@mm-actions/global';
 
+import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 describe('Analytics Sidebar Filter Component', () => {
   let component: AnalyticsSidebarFilterComponent;
   let fixture: ComponentFixture<AnalyticsSidebarFilterComponent>;
@@ -50,6 +52,7 @@ describe('Analytics Sidebar Filter Component', () => {
           FormsModule,
           TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
           MatExpansionModule,
+          MatIconTestingModule,
           MatIconModule,
           AnalyticsSidebarFilterComponent,
         ],
@@ -62,6 +65,9 @@ describe('Analytics Sidebar Filter Component', () => {
       })
       .compileComponents()
       .then(() => {
+
+
+
         fixture = TestBed.createComponent(AnalyticsSidebarFilterComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

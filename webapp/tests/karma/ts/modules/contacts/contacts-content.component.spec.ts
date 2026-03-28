@@ -31,6 +31,8 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { SearchTelemetryService } from '@mm-services/search-telemetry.service';
 
+import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 describe('Contacts content component', () => {
   let component: ContactsContentComponent;
   let fixture: ComponentFixture<ContactsContentComponent>;
@@ -120,6 +122,7 @@ describe('Contacts content component', () => {
           ContactsContentComponent,
           ResourceIconPipe,
           FastActionButtonComponent,
+          MatIconTestingModule,
         ],
         providers: [
           provideMockStore({ selectors: mockedSelectors }),
@@ -148,6 +151,9 @@ describe('Contacts content component', () => {
       })
       .compileComponents()
       .then(() => {
+
+
+
         fixture = TestBed.createComponent(ContactsContentComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

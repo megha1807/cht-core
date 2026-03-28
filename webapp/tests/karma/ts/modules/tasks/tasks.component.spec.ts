@@ -24,6 +24,8 @@ import { SessionService } from '@mm-services/session.service';
 import { DbService } from '@mm-services/db.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 
+import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 describe('TasksComponent', () => {
   let getComponent;
   let changesService;
@@ -60,6 +62,7 @@ describe('TasksComponent', () => {
         RouterTestingModule,
         MatIconModule,
         TasksComponent,
+        MatIconTestingModule,
         TasksSidebarFilterComponent,
         NavigationComponent,
         ToolBarComponent,
@@ -83,6 +86,9 @@ describe('TasksComponent', () => {
 
     getComponent = () => {
       return TestBed.compileComponents().then(() => {
+
+
+
         fixture = TestBed.createComponent(TasksComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

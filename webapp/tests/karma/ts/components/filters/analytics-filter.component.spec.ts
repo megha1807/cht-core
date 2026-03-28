@@ -14,6 +14,8 @@ import { SessionService } from '@mm-services/session.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { GlobalActions } from '@mm-actions/global';
 
+import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 describe('Analytics Filter Component', () => {
   let component: AnalyticsFilterComponent;
   let fixture: ComponentFixture<AnalyticsFilterComponent>;
@@ -55,6 +57,7 @@ describe('Analytics Filter Component', () => {
         imports: [
           TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
           MatIconModule,
+          MatIconTestingModule,
           AnalyticsFilterComponent,
         ],
         providers: [
@@ -68,6 +71,9 @@ describe('Analytics Filter Component', () => {
       })
       .compileComponents()
       .then(() => {
+
+
+
         fixture = TestBed.createComponent(AnalyticsFilterComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

@@ -32,8 +32,8 @@ import { ResourceIconPipe } from '@mm-pipes/resource-icon.pipe';
 import { SummaryPipe } from '@mm-pipes/message.pipe';
 import { FormIconNamePipe } from '@mm-pipes/form-icon-name.pipe';
 import { LocalizeNumberPipe } from '@mm-pipes/number.pipe';
-import { 
-  ContactSummaryContentComponent 
+import {
+  ContactSummaryContentComponent
 } from '@mm-components/contact-summary-content/contact-summary-content.component';
 
 @Component({
@@ -155,6 +155,14 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     await this.searchTelemetryService.recordContactSearch(nextSelectedContact.doc, nextFilters.search);
   }
 
+  // ✅ NEW: Initialize collapsed state for each card from config
+  private initializeCards(cards: any[] = []) {
+    return cards.map(card => ({
+      ...card,
+      collapsed: card.collapsed === true  // only true if explicitly set to true in config
+    }));
+  }
+
   private subscribeToStore() {
     const reduxSubscription = combineLatest([
       this.store.select(Selectors.getSelectedContact),
@@ -176,7 +184,20 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
         // reset view when selected contact changes
         this.resetTaskAndReportsFilter();
       }
-      this.selectedContact = selectedContact;
+
+      // ✅ CHANGED: Initialize collapsed state for cards when contact changes
+      if (selectedContact?.summary?.cards) {
+        this.selectedContact = {
+          ...selectedContact,
+          summary: {
+            ...selectedContact.summary,
+            cards: this.initializeCards(selectedContact.summary.cards)
+          }
+        };
+      } else {
+        this.selectedContact = selectedContact;
+      }
+
       this.loadingContent = loadingContent;
       this.forms = forms;
       this.loadingSelectedContactReports = loadingSelectedContactReports;
@@ -205,10 +226,27 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
         if (!summary || !this.selectedContact?.doc) {
           return;
         }
-        if (summary.errorStack){
+        if (summary.errorStack) {
           this.summaryErrorStack = summary.errorStack;
           return;
         }
+
+        // ✅ CHANGED: Initialize collapsed state when summary arrives separately
+        if (summary.cards) {
+          this.selectedContact = {
+            ...this.selectedContact,
+            summary: {
+              ...summary,
+              cards: this.initializeCards(summary.cards)
+            }
+          };
+        } else {
+          this.selectedContact = {
+            ...this.selectedContact,
+            summary
+          };
+        }
+
         this.subscribeToSelectedContactXmlForms();
       });
     this.subscriptions.add(contactSummarySubscription);
@@ -279,7 +317,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     }
     return filteredReports;
   }
-  
+
   filterTasks(weeks?, tasks?) {
     this.tasksTimeWindowWeeks = weeks;
     const taskEndDate = weeks ? moment().add(weeks, 'weeks').format('YYYY-MM-DD') : null;

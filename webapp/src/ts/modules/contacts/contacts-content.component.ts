@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { combineLatest, Subscription } from 'rxjs';
-import { first, take } from 'rxjs/operators';
+import { distinctUntilChanged, first, take } from 'rxjs/operators';
 import * as moment from 'moment';
 
 import { GlobalActions } from '@mm-actions/global';
@@ -155,7 +155,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     await this.searchTelemetryService.recordContactSearch(nextSelectedContact.doc, nextFilters.search);
   }
 
-  // ✅ Initialize collapsed state — only true if explicitly set to true in config
+  // Initialize collapsed state for cards — only true if explicitly set to true in config
   private initializeCards(cards: any[] = []) {
     return cards.map(card => ({
       ...card,
@@ -163,7 +163,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     }));
   }
 
-  // ✅ Apply card collapsed initialization to a contact object
+  // Apply card collapsed initialization to a contact object
   private applyCardCollapsedState(contact) {
     if (!contact?.summary?.cards) {
       return contact;
@@ -194,18 +194,40 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
       filters,
     ]) => {
       void this.recordSearchTelemetry(this.selectedContact, selectedContact, filters);
-      if (this.selectedContact?._id !== selectedContact?._id) {
+
+      const contactChanged = this.selectedContact?._id !== selectedContact?._id;
+      if (contactChanged) {
         // reset view when selected contact changes
         this.resetTaskAndReportsFilter();
+        // When contact changes, always re-initialize cards from the new contact
+        // This handles test case: "should reset collapsed state when selected contact changes"
+        this.selectedContact = this.applyCardCollapsedState(selectedContact);
+      } else if (!this.selectedContact) {
+        // First load — initialize cards
+        this.selectedContact = this.applyCardCollapsedState(selectedContact);
+      } else {
+        // Same contact — preserve existing card collapsed states (user may have toggled them)
+        // but update other fields from store
+        if (selectedContact?.summary?.cards && this.selectedContact?.summary?.cards) {
+          // Merge: keep existing collapsed states, update other card data
+          const existingCards = this.selectedContact.summary.cards;
+          const newCards = selectedContact.summary.cards.map((newCard, index) => ({
+            ...newCard,
+            collapsed: existingCards[index]?.label === newCard.label
+              ? existingCards[index].collapsed
+              : (newCard.collapsed === true)
+          }));
+          this.selectedContact = {
+            ...selectedContact,
+            summary: {
+              ...selectedContact.summary,
+              cards: newCards
+            }
+          };
+        } else {
+          this.selectedContact = this.applyCardCollapsedState(selectedContact);
+        }
       }
-
-      // ✅ KEY FIX: Apply collapsed state here because the spec sets summary.cards
-      // directly on getSelectedContact (not via getSelectedContactSummary).
-      // This handles all 3 failing test cases:
-      //   1. collapsed:true in config → initializeCards respects it
-      //   2. toggle click → card object is mutated directly, no re-init needed
-      //   3. contact change → new contact object goes through applyCardCollapsedState fresh
-      this.selectedContact = this.applyCardCollapsedState(selectedContact);
 
       this.loadingContent = loadingContent;
       this.forms = forms;
@@ -240,7 +262,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // ✅ Also handle case where summary arrives via getSelectedContactSummary separately
+        // Handle case where summary arrives via getSelectedContactSummary separately
         this.selectedContact = {
           ...this.selectedContact,
           summary: {

@@ -173,5 +173,48 @@ describe('Contact details page.', () => {
         .include('Error: Configuration error');
     });
   });
+  describe('Contact summary cards collapsing', () => {
+    const places = placeFactory.generateHierarchy();
+    const clinic = places.get('clinic');
+
+    const patient = personFactory.build({
+      name: 'Patient with cards',
+      phone: '+50683444445',
+      parent: { _id: clinic._id, parent: clinic.parent }
+    });
+
+    before(async () => {
+      await chtConfUtils.initializeConfigDir();
+      const contactSummaryFile = path.join(__dirname, 'config/contact-summary-config.js');
+
+      const { contactSummary } = await chtConfUtils.compileConfig({ contactSummary: contactSummaryFile });
+      await utils.updateSettings({ contact_summary: contactSummary }, { ignoreReload: true });
+
+      await utils.saveDocs([...places.values(), patient]);
+      await loginPage.cookieLogin();
+    });
+
+    it('should show contact summary cards expanded by default and allow collapsing', async () => {
+      await commonPage.goToPeople(patient._id);
+      await contactPage.waitForContactLoaded();
+
+      const cardHeader = await $('.compact-card .action-header');
+      const cardFields = await $('.compact-card .row.flex.grid');
+
+      
+      expect(await cardFields.isDisplayed()).to.be.true;
+      expect(await cardHeader.getAttribute('aria-expanded')).to.equal('true');
+
+      
+      await cardHeader.click();
+      expect(await cardFields.isDisplayed()).to.be.false;
+      expect(await cardHeader.getAttribute('aria-expanded')).to.equal('false');
+
+      
+      await cardHeader.click();
+      expect(await cardFields.isDisplayed()).to.be.true;
+      expect(await cardHeader.getAttribute('aria-expanded')).to.equal('true');
+    });
+  });
 });
 

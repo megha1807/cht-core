@@ -362,7 +362,6 @@ describe('Contacts content component', () => {
       expect(!!component.summaryErrorStack).to.be.false;
     });
   });
-
   describe('Quick page switches / Null safety', () => {
     it('should not crash if selectedContact is null when updating fast actions', async () => {
       (component as any).selectedContact = null;
@@ -406,4 +405,93 @@ describe('Contacts content component', () => {
       expect(fastActionButtonService.getContactRightSideActions.notCalled).to.be.true;
     });
   });
+
+  describe('collapsible contact summary cards', () => {
+    let cardSummary;
+
+    beforeEach(() => {
+      cardSummary = {
+        cards: [
+          { label: 'test-card', fields: [{ label: 'field1', value: 'val1' }] }
+        ]
+      };
+      store.overrideSelector(Selectors.getSelectedContact, {
+        ...selectedContact,
+        summary: cardSummary
+      });
+      store.refreshState();
+      fixture.detectChanges();
+    });
+
+    it('should default to expanded when collapsed is undefined', () => {
+      const compiled = fixture.nativeElement;
+      expect(compiled.querySelector('.row.flex.grid')).to.exist;
+    });
+
+    it('should start collapsed when collapsed: true is set in config', () => {
+      cardSummary.cards[0].collapsed = true;
+      store.overrideSelector(Selectors.getSelectedContact, {
+        ...selectedContact,
+        summary: cardSummary
+      });
+      store.refreshState();
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement;
+      expect(compiled.querySelector('.row.flex.grid')).to.not.exist;
+    });
+
+    it('should toggle collapsed state when header is clicked', () => {
+      const compiled = fixture.nativeElement;
+      const header = compiled.querySelector('.action-header');
+
+      // click to collapse
+      header.click();
+      fixture.detectChanges();
+      expect(compiled.querySelector('.row.flex.grid')).to.not.exist;
+
+      // click to expand
+      header.click();
+      fixture.detectChanges();
+      expect(compiled.querySelector('.row.flex.grid')).to.exist;
+    });
+
+    it('should reflect aria-expanded correctly', () => {
+      const compiled = fixture.nativeElement;
+      const header = compiled.querySelector('.action-header');
+
+      // expanded by default
+      expect(header.getAttribute('aria-expanded')).to.equal('true');
+
+      // collapsed after click
+      header.click();
+      fixture.detectChanges();
+      expect(header.getAttribute('aria-expanded')).to.equal('false');
+    });
+
+    it('should reset collapsed state when selected contact changes', () => {
+      const compiled = fixture.nativeElement;
+      const header = compiled.querySelector('.action-header');
+
+      // collapse the card
+      header.click();
+      fixture.detectChanges();
+      expect(compiled.querySelector('.row.flex.grid')).to.not.exist;
+
+      // change selected contact - new object resets state
+      store.overrideSelector(Selectors.getSelectedContact, {
+        _id: 'new-contact',
+        doc: {},
+        type: {},
+        summary: { cards: [{ label: 'test-card', fields: [] }] },
+        children: [],
+        tasks: [],
+        reports: []
+      });
+      store.refreshState();
+      fixture.detectChanges();
+
+      expect(compiled.querySelector('.row.flex.grid')).to.exist;
+    });
+  }); 
 });

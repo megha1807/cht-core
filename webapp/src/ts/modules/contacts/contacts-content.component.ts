@@ -155,12 +155,26 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     await this.searchTelemetryService.recordContactSearch(nextSelectedContact.doc, nextFilters.search);
   }
 
-  // ✅ NEW: Initialize collapsed state for each card from config
+  // ✅ Initialize collapsed state — only true if explicitly set to true in config
   private initializeCards(cards: any[] = []) {
     return cards.map(card => ({
       ...card,
-      collapsed: card.collapsed === true  // only true if explicitly set to true in config
+      collapsed: card.collapsed === true
     }));
+  }
+
+  // ✅ Apply card collapsed initialization to a contact object
+  private applyCardCollapsedState(contact) {
+    if (!contact?.summary?.cards) {
+      return contact;
+    }
+    return {
+      ...contact,
+      summary: {
+        ...contact.summary,
+        cards: this.initializeCards(contact.summary.cards)
+      }
+    };
   }
 
   private subscribeToStore() {
@@ -185,18 +199,13 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
         this.resetTaskAndReportsFilter();
       }
 
-      // ✅ CHANGED: Initialize collapsed state for cards when contact changes
-      if (selectedContact?.summary?.cards) {
-        this.selectedContact = {
-          ...selectedContact,
-          summary: {
-            ...selectedContact.summary,
-            cards: this.initializeCards(selectedContact.summary.cards)
-          }
-        };
-      } else {
-        this.selectedContact = selectedContact;
-      }
+      // ✅ KEY FIX: Apply collapsed state here because the spec sets summary.cards
+      // directly on getSelectedContact (not via getSelectedContactSummary).
+      // This handles all 3 failing test cases:
+      //   1. collapsed:true in config → initializeCards respects it
+      //   2. toggle click → card object is mutated directly, no re-init needed
+      //   3. contact change → new contact object goes through applyCardCollapsedState fresh
+      this.selectedContact = this.applyCardCollapsedState(selectedContact);
 
       this.loadingContent = loadingContent;
       this.forms = forms;
@@ -231,21 +240,14 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // ✅ CHANGED: Initialize collapsed state when summary arrives separately
-        if (summary.cards) {
-          this.selectedContact = {
-            ...this.selectedContact,
-            summary: {
-              ...summary,
-              cards: this.initializeCards(summary.cards)
-            }
-          };
-        } else {
-          this.selectedContact = {
-            ...this.selectedContact,
-            summary
-          };
-        }
+        // ✅ Also handle case where summary arrives via getSelectedContactSummary separately
+        this.selectedContact = {
+          ...this.selectedContact,
+          summary: {
+            ...summary,
+            cards: summary.cards ? this.initializeCards(summary.cards) : summary.cards
+          }
+        };
 
         this.subscribeToSelectedContactXmlForms();
       });

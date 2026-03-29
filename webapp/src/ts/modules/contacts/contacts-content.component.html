@@ -46,15 +46,15 @@
         <ng-container *ngIf="selectedContact?.summary">
           <div *ngFor="let card of selectedContact?.summary?.cards">
             <div class="card compact-card" [attr.test-id]="card.label">
-              <div 
+              <button
+              type="button"
               class="action-header cell"
-              role="button"
               (click)="card.collapsed = !card.collapsed"
               [attr.aria-expanded]="!card.collapsed"
               >
                 <h3>{{card.label | translate}}</h3>
                  <i class="fa" [ngClass]="card.collapsed ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
-              </div>
+            </button>
               <div class="row flex grid" *ngIf="!card.collapsed">
                 <div class="col col-xs-12 col-sm-{{field.width || 12}}" *ngFor="let field of card.fields">
                   <div class="cell">

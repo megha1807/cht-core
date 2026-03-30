@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { combineLatest, Subscription } from 'rxjs';
-import { distinctUntilChanged, first, take } from 'rxjs/operators';
+import { first, take } from 'rxjs/operators';
 import * as moment from 'moment';
 
 import { GlobalActions } from '@mm-actions/global';
@@ -177,6 +177,33 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     };
   }
 
+  // Preserve existing collapsed states when same contact updates, re-init on contact change
+  private mergeCardCollapsedState(selectedContact) {
+    const contactChanged = this.selectedContact?._id !== selectedContact?._id;
+    const hasSameContactCards = !contactChanged
+      && selectedContact?.summary?.cards
+      && this.selectedContact?.summary?.cards;
+
+    if (hasSameContactCards) {
+      const existingCards = this.selectedContact.summary.cards;
+      const mergedCards = selectedContact.summary.cards.map((newCard, index) => ({
+        ...newCard,
+        collapsed: existingCards[index]?.label === newCard.label
+          ? existingCards[index].collapsed
+          : newCard.collapsed === true
+      }));
+      return {
+        ...selectedContact,
+        summary: {
+          ...selectedContact.summary,
+          cards: mergedCards
+        }
+      };
+    }
+
+    return this.applyCardCollapsedState(selectedContact);
+  }
+
   private subscribeToStore() {
     const reduxSubscription = combineLatest([
       this.store.select(Selectors.getSelectedContact),
@@ -194,40 +221,11 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
       filters,
     ]) => {
       void this.recordSearchTelemetry(this.selectedContact, selectedContact, filters);
-
-      const contactChanged = this.selectedContact?._id !== selectedContact?._id;
-      if (contactChanged) {
-        // reset view when selected contact changes
+      if (this.selectedContact?._id !== selectedContact?._id) {
         this.resetTaskAndReportsFilter();
-        // When contact changes, always re-initialize cards from the new contact
-        // This handles test case: "should reset collapsed state when selected contact changes"
-        this.selectedContact = this.applyCardCollapsedState(selectedContact);
-      } else if (!this.selectedContact) {
-        // First load — initialize cards
-        this.selectedContact = this.applyCardCollapsedState(selectedContact);
-      } else {
-        // Same contact — preserve existing card collapsed states (user may have toggled them)
-        // but update other fields from store
-        if (selectedContact?.summary?.cards && this.selectedContact?.summary?.cards) {
-          // Merge: keep existing collapsed states, update other card data
-          const existingCards = this.selectedContact.summary.cards;
-          const newCards = selectedContact.summary.cards.map((newCard, index) => ({
-            ...newCard,
-            collapsed: existingCards[index]?.label === newCard.label
-              ? existingCards[index].collapsed
-              : (newCard.collapsed === true)
-          }));
-          this.selectedContact = {
-            ...selectedContact,
-            summary: {
-              ...selectedContact.summary,
-              cards: newCards
-            }
-          };
-        } else {
-          this.selectedContact = this.applyCardCollapsedState(selectedContact);
-        }
       }
+
+      this.selectedContact = this.mergeCardCollapsedState(selectedContact);
 
       this.loadingContent = loadingContent;
       this.forms = forms;
@@ -262,7 +260,6 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Handle case where summary arrives via getSelectedContactSummary separately
         this.selectedContact = {
           ...this.selectedContact,
           summary: {

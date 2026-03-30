@@ -155,7 +155,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     await this.searchTelemetryService.recordContactSearch(nextSelectedContact.doc, nextFilters.search);
   }
 
-  // Initialize collapsed state for cards — only true if explicitly set to true in config
+  // Initialize collapsed state for each card — only true if explicitly set to true in config
   private initializeCards(cards: any[] = []) {
     return cards.map(card => ({
       ...card,
@@ -163,8 +163,10 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     }));
   }
 
-  // Apply card collapsed initialization to a contact object
-  private applyCardCollapsedState(contact) {
+  // Always re-initialize cards collapsed state from the incoming contact object.
+  // The collapsed state is stored directly on the card object in the DOM (via click handler),
+  // so the store always has the original config values — we can safely re-init each time.
+  private withInitializedCards(contact) {
     if (!contact?.summary?.cards) {
       return contact;
     }
@@ -175,33 +177,6 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
         cards: this.initializeCards(contact.summary.cards)
       }
     };
-  }
-
-  // Preserve existing collapsed states when same contact updates, re-init on contact change
-  private mergeCardCollapsedState(selectedContact) {
-    const contactChanged = this.selectedContact?._id !== selectedContact?._id;
-    const hasSameContactCards = !contactChanged
-      && selectedContact?.summary?.cards
-      && this.selectedContact?.summary?.cards;
-
-    if (hasSameContactCards) {
-      const existingCards = this.selectedContact.summary.cards;
-      const mergedCards = selectedContact.summary.cards.map((newCard, index) => ({
-        ...newCard,
-        collapsed: existingCards[index]?.label === newCard.label
-          ? existingCards[index].collapsed
-          : newCard.collapsed === true
-      }));
-      return {
-        ...selectedContact,
-        summary: {
-          ...selectedContact.summary,
-          cards: mergedCards
-        }
-      };
-    }
-
-    return this.applyCardCollapsedState(selectedContact);
   }
 
   private subscribeToStore() {
@@ -224,9 +199,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
       if (this.selectedContact?._id !== selectedContact?._id) {
         this.resetTaskAndReportsFilter();
       }
-
-      this.selectedContact = this.mergeCardCollapsedState(selectedContact);
-
+      this.selectedContact = this.withInitializedCards(selectedContact);
       this.loadingContent = loadingContent;
       this.forms = forms;
       this.loadingSelectedContactReports = loadingSelectedContactReports;
@@ -259,7 +232,6 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
           this.summaryErrorStack = summary.errorStack;
           return;
         }
-
         this.selectedContact = {
           ...this.selectedContact,
           summary: {
@@ -267,7 +239,6 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
             cards: summary.cards ? this.initializeCards(summary.cards) : summary.cards
           }
         };
-
         this.subscribeToSelectedContactXmlForms();
       });
     this.subscriptions.add(contactSummarySubscription);

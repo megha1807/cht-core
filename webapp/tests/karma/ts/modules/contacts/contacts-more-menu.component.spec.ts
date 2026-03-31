@@ -78,7 +78,7 @@ describe('Contacts More Menu Component', () => {
 
   describe('displayEditOption', () => {
     it('should display edit option when user has all conditions okay', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.online.returns(true);
       userSettingsService.get.resolves({ facility_id: 'facility-1' });
 
@@ -94,7 +94,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should display edit option when user is online and facility id is his contact id', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.online.returns(true);
       userSettingsService.get.resolves({ facility_id: 'contact-1' });
 
@@ -110,7 +110,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should display edit option when user is offline and facility id is not his contact id', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.online.returns(false);
       userSettingsService.get.resolves({ facility_id: 'facility-1' });
 
@@ -126,7 +126,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display edit option when is not detail page', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.online.returns(true);
       userSettingsService.get.resolves({ facility_id: 'facility-1' });
 
@@ -142,7 +142,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display edit option when user does not have can_edit permission', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(false);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(false);
       authService.online.returns(true);
       userSettingsService.get.resolves({ facility_id: 'facility-1' });
 
@@ -158,7 +158,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display edit option when content is loading', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.online.returns(true);
       userSettingsService.get.resolves({ facility_id: 'facility-1' });
 
@@ -174,7 +174,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display edit option when user does not have all the conditions', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(false);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(false);
       authService.online.returns(false);
       userSettingsService.get.resolves({ facility_id: 'contact-1' });
 
@@ -192,7 +192,7 @@ describe('Contacts More Menu Component', () => {
 
   describe('displayDeleteOption', () => {
     it('should display delete option when user has all conditions okay', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.has.withArgs('can_delete_contacts').resolves(true);
 
       component.ngOnInit();
@@ -207,7 +207,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display delete option when is not detail page', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.has.withArgs('can_delete_contacts').resolves(true);
 
       component.ngOnInit();
@@ -222,7 +222,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display delete option when user does not have can_edit permission', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(false);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(false);
       authService.has.withArgs('can_delete_contacts').resolves(true);
 
       component.ngOnInit();
@@ -237,7 +237,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display delete option when user does not have can_delete_contacts permission', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.has.withArgs('can_delete_contacts').resolves(false);
 
       component.ngOnInit();
@@ -252,7 +252,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display delete option when content is loading', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(true);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(true);
       authService.has.withArgs('can_delete_contacts').resolves(true);
 
       component.ngOnInit();
@@ -267,7 +267,7 @@ describe('Contacts More Menu Component', () => {
     }));
 
     it('should not display delete option when user does not have all the conditions', fakeAsync(() => {
-      authService.has.withArgs('can_edit').resolves(false);
+      authService.has.withArgs(['can_edit', 'can_update_contacts']).resolves(false);
       authService.has.withArgs('can_delete_contacts').resolves(false);
 
       component.ngOnInit();

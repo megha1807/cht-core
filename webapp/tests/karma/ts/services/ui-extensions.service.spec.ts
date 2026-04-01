@@ -31,7 +31,7 @@ describe('UiExtensionsService', () => {
   });
 
   describe('init()', () => {
-    it('should load extension properties on first call', async () => {
+    it('should load extension properties only on first call', async () => {
       const extensions = [
         { id: 'ext-1', type: 'tab' },
         { id: 'ext-2', type: 'tab' },
@@ -41,15 +41,11 @@ describe('UiExtensionsService', () => {
       await service.getPropertiesByType('tab');
 
       expect(http.get.calledOnceWithExactly('/ui-extension', { responseType: 'json' })).to.be.true;
-    });
-
-    it('should only initialize once when called multiple times', async () => {
-      http.get.returns(of([]));
 
       await service.getPropertiesByType('tab');
-      await service.getPropertiesByType('tab');
-      await service.getPropertiesByType('tab');
+      await service.getProperties('ext-1');
 
+      // Not fetched again on later requests
       expect(http.get.callCount).to.equal(1);
     });
 
@@ -174,7 +170,7 @@ describe('UiExtensionsService', () => {
   });
 
   describe('getExtension()', () => {
-    it('should load and return extension with Element', async () => {
+    it('should load and return extension with Element and cache it', async () => {
       const extensions = [{ id: 'ext-1', type: 'tab' }];
       http.get.onCall(0).returns(of(extensions));
       http.get.onCall(1).returns(of(
@@ -186,20 +182,13 @@ describe('UiExtensionsService', () => {
       expect(result).to.not.be.undefined;
       expect(result.properties).to.deep.equal({ id: 'ext-1', type: 'tab' });
       expect(result.Element.prototype).to.be.an.instanceof(HTMLElement);
+      expect(http.get.callCount).to.equal(2);
       expect(http.get.args[1][0]).to.equal('/ui-extension/ext-1');
       expect(http.get.args[1][1]).to.deep.equal({ responseType: 'text' });
-    });
-
-    it('should cache extension script and not reload on second call', async () => {
-      const extensions = [{ id: 'ext-1', type: 'tab' }];
-      http.get.onCall(0).returns(of(extensions));
-      http.get.onCall(1).returns(of(
-        'module.exports = class HelloWorldComponent extends HTMLElement {}'
-      ));
 
       await service.getExtension('ext-1');
-      await service.getExtension('ext-1');
 
+      // cached extensions are not re-fetched.
       expect(http.get.callCount).to.equal(2);
     });
 

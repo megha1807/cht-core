@@ -23,7 +23,7 @@ interface UiExtension {
 })
 export class UiExtensionsService {
   private extensionProperties: UiExtensionProperties[] = [];
-  private extensionScripts: Record<string, any> = {};
+  private extensionScripts: Record<string, new () => HTMLElement> = {};
   private initialized = false;
 
   constructor(
@@ -63,7 +63,6 @@ export class UiExtensionsService {
     if (!Element || !(Element.prototype instanceof HTMLElement)) {
       throw new Error(`Could not load UI Extension element with id [${id}].`);
     }
-    this.extensionScripts[id] = Element;
     return Element as new () => HTMLElement;
   }
 
@@ -85,7 +84,7 @@ export class UiExtensionsService {
     const properties = await this.getProperties(id);
 
     if (!this.extensionScripts[id]) {
-      await this.loadExtensionScript(id);
+      this.extensionScripts[id] = await this.loadExtensionScript(id);
     }
 
     return {

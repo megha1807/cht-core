@@ -711,7 +711,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(2);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_view_message_action', 'can_edit' ] ],
+        [ [ 'can_view_message_action', 'can_edit', 'can_update_contacts' ] ],
         [ 'can_edit' ],
       ]);
 
@@ -801,7 +801,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(0);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_view_message_action', 'can_edit' ] ],
+        [ [ 'can_view_message_action', 'can_edit', 'can_update_contacts' ] ],
         [ 'can_edit' ],
       ]);
     });
@@ -821,7 +821,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(1);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_view_message_action', 'can_edit' ] ],
+        [ [ 'can_view_message_action', 'can_edit', 'can_update_contacts' ] ],
       ]);
 
       assertSendMessageAction(actions[0], context.communicationContext);

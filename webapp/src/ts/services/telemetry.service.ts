@@ -22,7 +22,7 @@ export class TelemetryService {
   constructor(
     private dbService:DbService,
     private sessionService:SessionService,
-    private versionService:VersionService,
+    private readonly versionService:VersionService,
     private ngZone:NgZone,
     @Inject(DOCUMENT) private document:Document,
   ) {
@@ -93,7 +93,7 @@ export class TelemetryService {
           deviceId: this.getUniqueDeviceId(),
           versions: {
             app: version,
-            serviceWorker: serviceWorkerInfo?.version,   
+            serviceWorker: serviceWorkerInfo?.version,
             forms: forms,
             settings: settingsResults?.rows?.[0].value?.rev,
           }

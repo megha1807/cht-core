@@ -53,6 +53,7 @@ export class AboutComponent implements OnInit, OnDestroy {
   androidDataUsage;
   androidDeviceInfo;
   version;
+  appVersion;
   localRev;
   remoteRev;
   dbInfo;
@@ -128,6 +129,15 @@ export class AboutComponent implements OnInit, OnDestroy {
         return this.translateService.get('app.version.unknown');
       })
       .then(rev => this.remoteRev = rev);
+
+    this.versionService
+      .getServiceWorker()
+      .then(({ version }) => {
+        this.appVersion = version;
+      })
+      .catch(error => {
+        console.debug('Could not access service worker app version', error);
+      });
   }
 
   private refreshAndroidDataUsage() {

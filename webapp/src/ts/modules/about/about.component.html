@@ -24,6 +24,11 @@
             <p test-id="about-version">{{version}}</p>
           </div>
 
+          <div *ngIf="appVersion">
+            <label translate>app.version</label>
+            <p test-id="about-app-version">{{appVersion}}</p>
+          </div>
+
           <div>
             <label translate>debug.supported_browser</label>
             <div>

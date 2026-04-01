@@ -39,6 +39,7 @@ describe('About Component', () => {
     versionService = {
       getLocal: sinon.stub().resolves('123'),
       getRemoteRev: sinon.stub().resolves('456'),
+      getServiceWorker: sinon.stub().resolves({ version: '4.5.0' }),
     };
 
     dbInfo = sinon.stub().resolves('db-info');
@@ -117,6 +118,7 @@ describe('About Component', () => {
     expect(component.remoteRev).to.equal('15');
     expect(component.androidDataUsage).to.be.undefined;
     expect(component.androidDeviceInfo).to.be.undefined;
+    expect(component.appVersion).to.equal('4.5.0');
   }));
 
   it('should initialize data when the device is android', fakeAsync(() => {
@@ -159,6 +161,7 @@ describe('About Component', () => {
       },
       software: { androidVersion: '9', osApiLevel: 28 }
     });
+    expect(component.appVersion).to.equal('4.5.0');
   }));
 
   it('should display partner logo if it exists', fakeAsync(() => {
@@ -197,6 +200,30 @@ describe('About Component', () => {
 
     expect(consoleErrorMock.callCount).to.equal(1);
     expect(consoleErrorMock.args[0][0]).to.equal('Error fetching "partners" doc');
+  }));
+
+  it('should set appVersion from service worker deploy info', fakeAsync(() => {
+    versionService.getLocal.resolves({ version: '3.5.0', rev: '12' });
+    versionService.getRemoteRev.resolves('15');
+    versionService.getServiceWorker.resolves({ version: '4.5.0' });
+
+    component.ngOnInit();
+    flush();
+    discardPeriodicTasks();
+
+    expect(component.appVersion).to.equal('4.5.0');
+  }));
+
+  it('should handle failure to get service worker app version', fakeAsync(() => {
+    versionService.getLocal.resolves({ version: '3.5.0', rev: '12' });
+    versionService.getRemoteRev.resolves('15');
+    versionService.getServiceWorker.rejects(new Error('SW not available'));
+
+    component.ngOnInit();
+    flush();
+    discardPeriodicTasks();
+
+    expect(component.appVersion).to.be.undefined;
   }));
 
   describe('secretDoor()', () => {

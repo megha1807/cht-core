@@ -166,7 +166,8 @@ describe('Fast Action Button service', () => {
       const actions = await service.getMessageActions(context);
 
       expect(actions.length).to.equal(1);
-      expect(authService.has.args[0][0]).to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
+      expect(authService.has.args[0][0])
+        .to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
       assertSendMessageAction(actions[0], context);
 
       sinon.resetHistory();
@@ -175,7 +176,8 @@ describe('Fast Action Button service', () => {
       const mobileActions = await service.getMessageActions(context);
 
       expect(mobileActions.length).to.equal(1);
-      expect(authService.has.args[0][0]).to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
+      expect(authService.has.args[0][0])
+        .to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
       // Message tab doesn't use mailto in mobile display, the action should be the same as in desktop
       assertSendMessageAction(actions[0], context);
     });
@@ -190,7 +192,8 @@ describe('Fast Action Button service', () => {
       const actions = await service.getMessageActions(context);
 
       expect(actions.length).to.equal(1);
-      expect(authService.has.args[0][0]).to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
+      expect(authService.has.args[0][0])
+        .to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
       assertSendMessageAction(actions[0], context);
     });
   });

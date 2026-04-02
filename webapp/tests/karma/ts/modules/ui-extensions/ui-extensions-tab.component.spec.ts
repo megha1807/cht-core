@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -45,6 +46,7 @@ describe('UiExtensionsTabComponent', () => {
       imports: [
         TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
         RouterTestingModule,
+        HttpClientTestingModule,
         UiExtensionsTabComponent,
         ToolBarComponent,
       ],

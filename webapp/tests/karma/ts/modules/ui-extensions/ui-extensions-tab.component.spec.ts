@@ -1,8 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { provideMockStore } from '@ngrx/store/testing';
@@ -12,7 +10,6 @@ import { CHTDatasourceService } from '@mm-services/cht-datasource.service';
 import { PerformanceService } from '@mm-services/performance.service';
 import { UiExtensionsService } from '@mm-services/ui-extensions.service';
 import { UserContactSummaryService } from '@mm-services/user-contact-summary.service';
-import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
 
 describe('UiExtensionsTabComponent', () => {
   let fixture: ComponentFixture<UiExtensionsTabComponent>;
@@ -43,13 +40,7 @@ describe('UiExtensionsTabComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
-        RouterTestingModule,
-        HttpClientTestingModule,
-        UiExtensionsTabComponent,
-        ToolBarComponent,
-      ],
+      imports: [UiExtensionsTabComponent],
       providers: [
         provideMockStore(),
         { provide: ActivatedRoute, useValue: { snapshot: { params: { id: EXTENSION_ID } } } },
@@ -57,7 +48,8 @@ describe('UiExtensionsTabComponent', () => {
         { provide: CHTDatasourceService, useValue: chtDatasourceService },
         { provide: PerformanceService, useValue: performanceService },
         { provide: UserContactSummaryService, useValue: userContactSummaryService },
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UiExtensionsTabComponent);

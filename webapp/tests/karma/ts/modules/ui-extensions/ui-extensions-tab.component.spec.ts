@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testi
 import { ActivatedRoute } from '@angular/router';
 import { expect } from 'chai';
 import sinon from 'sinon';
+import { provideMockStore } from '@ngrx/store/testing';
 
 import { UiExtensionsTabComponent } from '@mm-modules/ui-extensions/ui-extensions-tab.component';
 import { CHTDatasourceService } from '@mm-services/cht-datasource.service';
@@ -41,6 +42,7 @@ describe('UiExtensionsTabComponent', () => {
     await TestBed.configureTestingModule({
       imports: [UiExtensionsTabComponent, ToolBarComponent],
       providers: [
+        provideMockStore(),
         { provide: ActivatedRoute, useValue: { snapshot: { params: { id: EXTENSION_ID } } } },
         { provide: UiExtensionsService, useValue: uiExtensionsService },
         { provide: CHTDatasourceService, useValue: chtDatasourceService },

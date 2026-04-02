@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { provideMockStore } from '@ngrx/store/testing';
@@ -40,7 +42,12 @@ describe('UiExtensionsTabComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [UiExtensionsTabComponent, ToolBarComponent],
+      imports: [
+        TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
+        RouterTestingModule,
+        UiExtensionsTabComponent,
+        ToolBarComponent,
+      ],
       providers: [
         provideMockStore(),
         { provide: ActivatedRoute, useValue: { snapshot: { params: { id: EXTENSION_ID } } } },

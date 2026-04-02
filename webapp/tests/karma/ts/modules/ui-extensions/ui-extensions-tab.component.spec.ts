@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { provideMockStore } from '@ngrx/store/testing';
@@ -10,6 +12,10 @@ import { CHTDatasourceService } from '@mm-services/cht-datasource.service';
 import { PerformanceService } from '@mm-services/performance.service';
 import { UiExtensionsService } from '@mm-services/ui-extensions.service';
 import { UserContactSummaryService } from '@mm-services/user-contact-summary.service';
+import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
+import { NavigationService } from '@mm-services/navigation.service';
+import { AuthService } from '@mm-services/auth.service';
+import { SessionService } from '@mm-services/session.service';
 
 describe('UiExtensionsTabComponent', () => {
   let fixture: ComponentFixture<UiExtensionsTabComponent>;
@@ -19,6 +25,8 @@ describe('UiExtensionsTabComponent', () => {
   let chtDatasourceService;
   let performanceService;
   let userContactSummaryService;
+  let authService;
+  let sessionService;
   let trackStop;
 
   const EXTENSION_ID = 'my-extension';
@@ -32,6 +40,8 @@ describe('UiExtensionsTabComponent', () => {
     performanceService = { track: sinon.stub().returns({ stop: trackStop }) };
     chtDatasourceService = { get: sinon.stub().resolves(MOCK_CHT_API) };
     userContactSummaryService = { get: sinon.stub().resolves(MOCK_USER_SUMMARY) };
+    authService = { has: sinon.stub().resolves(true) };
+    sessionService = { isAdmin: sinon.stub().returns(false) };
     uiExtensionsService = {
       getExtension: sinon.stub().resolves({
         properties: { id: EXTENSION_ID, type: 'app_main_tab', config: MOCK_CONFIG },
@@ -40,7 +50,13 @@ describe('UiExtensionsTabComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [UiExtensionsTabComponent],
+      imports: [
+        TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
+        RouterTestingModule,
+        MatIconModule,
+        UiExtensionsTabComponent,
+        ToolBarComponent,
+      ],
       providers: [
         provideMockStore(),
         { provide: ActivatedRoute, useValue: { snapshot: { params: { id: EXTENSION_ID } } } },
@@ -48,8 +64,10 @@ describe('UiExtensionsTabComponent', () => {
         { provide: CHTDatasourceService, useValue: chtDatasourceService },
         { provide: PerformanceService, useValue: performanceService },
         { provide: UserContactSummaryService, useValue: userContactSummaryService },
-      ],
-      schemas: [NO_ERRORS_SCHEMA],
+        { provide: NavigationService, useValue: {} },
+        { provide: AuthService, useValue: authService },
+        { provide: SessionService, useValue: sessionService },
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(UiExtensionsTabComponent);

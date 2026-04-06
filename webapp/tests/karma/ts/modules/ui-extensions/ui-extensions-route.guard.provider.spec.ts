@@ -31,29 +31,27 @@ describe('UiExtensionsTabRouteGuardProvider', () => {
     uiExtensionsService.getProperties.resolves({ id: 'ext-1', type: 'app_main_tab' });
     const result = await guard.canActivate(getRoute('ext-1'));
     expect(result).to.be.true;
+    expect(uiExtensionsService.getProperties).to.have.been.calledOnceWithExactly('ext-1');
   });
 
   it('should activate for app_drawer_tab type', async () => {
     uiExtensionsService.getProperties.resolves({ id: 'ext-2', type: 'app_drawer_tab' });
     const result = await guard.canActivate(getRoute('ext-2'));
     expect(result).to.be.true;
+    expect(uiExtensionsService.getProperties).to.have.been.calledOnceWithExactly('ext-2');
   });
 
   it('should not activate for unknown type', async () => {
     uiExtensionsService.getProperties.resolves({ id: 'ext-3', type: 'other_type' });
     const result = await guard.canActivate(getRoute('ext-3'));
     expect(result).to.be.false;
+    expect(uiExtensionsService.getProperties).to.have.been.calledOnceWithExactly('ext-3');
   });
 
   it('should not activate when extension properties not found', async () => {
     uiExtensionsService.getProperties.rejects(new Error('not found'));
     const result = await guard.canActivate(getRoute('missing-ext'));
     expect(result).to.be.false;
-  });
-
-  it('should pass the route id to getProperties', async () => {
-    uiExtensionsService.getProperties.resolves({ id: 'ext-4', type: 'app_main_tab' });
-    await guard.canActivate(getRoute('ext-4'));
-    expect(uiExtensionsService.getProperties.calledOnceWith('ext-4')).to.be.true;
+    expect(uiExtensionsService.getProperties).to.have.been.calledOnceWithExactly('missing-ext');
   });
 });

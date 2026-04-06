@@ -7,16 +7,18 @@ import { PerformanceService } from '@mm-services/performance.service';
 import { UiExtensionsService } from '@mm-services/ui-extensions.service';
 import { UserContactSummaryService } from '@mm-services/user-contact-summary.service';
 import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
+import { ErrorLogComponent } from '@mm-components/error-log/error-log.component';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './ui-extensions-tab.component.html',
-  imports: [ToolBarComponent, TranslatePipe, NgIf]
+  imports: [ToolBarComponent, ErrorLogComponent, TranslatePipe, NgIf]
 })
 export class UiExtensionsTabComponent implements AfterViewInit {
   @ViewChild('uiElementTab') container!: ElementRef;
   extensionTitle = '';
   loading = true;
+  errorStack?: string;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -52,6 +54,7 @@ export class UiExtensionsTabComponent implements AfterViewInit {
       this.container.nativeElement.appendChild(element);
     } catch (error) {
       console.error(`Error initializing UI extension: "${extensionId}"`, error);
+      this.errorStack = error?.stack;
     } finally {
       this.loading = false;
       await trackRender?.stop({ name: `ui-extension:${extensionId}:render` });

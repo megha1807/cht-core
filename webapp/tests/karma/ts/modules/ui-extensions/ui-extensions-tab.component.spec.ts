@@ -13,6 +13,7 @@ import { PerformanceService } from '@mm-services/performance.service';
 import { UiExtensionsService } from '@mm-services/ui-extensions.service';
 import { UserContactSummaryService } from '@mm-services/user-contact-summary.service';
 import { NavigationService } from '@mm-services/navigation.service';
+import { SessionService } from '@mm-services/session.service';
 
 describe('UiExtensionsTabComponent', () => {
   let fixture: ComponentFixture<UiExtensionsTabComponent>;
@@ -63,6 +64,7 @@ describe('UiExtensionsTabComponent', () => {
         { provide: PerformanceService, useValue: performanceService },
         { provide: UserContactSummaryService, useValue: userContactSummaryService },
         { provide: NavigationService, useValue: {} },
+        { provide: SessionService, useValue: { userCtx: sinon.stub().returns({ name: 'test-user' }) } },
       ]
     }).compileComponents();
 
@@ -86,6 +88,7 @@ describe('UiExtensionsTabComponent', () => {
       userContactSummary: MOCK_USER_SUMMARY,
     });
     expect(component.loading).to.be.false;
+    expect(component.errorStack).to.be.undefined;
     expect(component.extensionTitle).to.equal(EXTENSION_TITLE);
     expect(uiExtensionsService.getExtension).to.have.been.calledOnceWithExactly(EXTENSION_ID);
     expect(performanceService.track).to.have.been.calledOnceWithExactly();
@@ -105,6 +108,7 @@ describe('UiExtensionsTabComponent', () => {
 
     expect(element).to.not.exist;
     expect(component.loading).to.be.false;
+    expect(component.errorStack).to.equal(expectedError.stack);
     expect(consoleErrorMock).to.have.been.calledWithExactly(
       `Error initializing UI extension: "${EXTENSION_ID}"`,
       expectedError

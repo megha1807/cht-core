@@ -62,6 +62,28 @@ describe('Edit ', () => {
     await commonPage.logout();
   });
 
+ it('should not show edit option when user lacks can_update_contacts permission', async () => {
+  const settings = await utils.getSettings();
+  const originalPermissions = cloneDeep(settings.permissions);
+
+  
+    await utils.updateSettings({ permissions: { ...settings.permissions, can_update_contacts: [] } });
+
+    await loginPage.login(offlineUser);
+    await commonPage.waitForPageLoaded();
+    await commonPage.goToPeople();
+    await contactPage.selectLHSRowByText(healthCenter.name);
+    await contactPage.waitForContactLoaded();
+
+  
+    await commonPage.openMoreOptionsMenu();
+  expect(await commonPage.isMenuOptionVisible('edit')).to.be.false;
+    await commonPage.logout();
+
+  
+    await utils.updateSettings({ permissions: originalPermissions });
+});
+
   it('should sync and update the offline user\'s home place', async () => {
     await loginPage.login(offlineUser);
     await commonPage.waitForPageLoaded();

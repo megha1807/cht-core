@@ -167,7 +167,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(1);
       expect(authService.has.args[0][0])
-        .to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
+        .to.have.members([ 'can_view_message_action', 'can_update_contacts' ]);
       assertSendMessageAction(actions[0], context);
 
       sinon.resetHistory();
@@ -177,7 +177,7 @@ describe('Fast Action Button service', () => {
 
       expect(mobileActions.length).to.equal(1);
       expect(authService.has.args[0][0])
-        .to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
+        .to.have.members([ 'can_view_message_action', 'can_update_contacts' ]);
       // Message tab doesn't use mailto in mobile display, the action should be the same as in desktop
       assertSendMessageAction(actions[0], context);
     });
@@ -193,7 +193,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(1);
       expect(authService.has.args[0][0])
-        .to.have.members([ 'can_view_message_action', 'can_edit', 'can_update_contacts' ]);
+        .to.have.members([ 'can_view_message_action', 'can_update_contacts' ]);
       assertSendMessageAction(actions[0], context);
     });
   });
@@ -225,10 +225,10 @@ describe('Fast Action Button service', () => {
       expect(actions.length).to.equal(7);
       expect(authService.has.args).to.have.deep.members([
         [ 'can_view_call_action' ],
-        [ [ 'can_view_message_action', 'can_edit', 'can_update_contacts' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_people' ] ],
+        [ [ 'can_view_message_action', 'can_update_contacts' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_people' ] ],
         [ 'can_edit' ],
         [ 'can_edit' ],
         [ 'can_edit' ],
@@ -303,9 +303,9 @@ describe('Fast Action Button service', () => {
       expect(authService.has.args).to.have.deep.members([
         [ 'can_view_call_action' ],
         [ [ 'can_view_message_action' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_people' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_people' ] ],
         [ 'can_edit' ],
         [ 'can_edit' ],
         [ 'can_edit' ],
@@ -396,8 +396,8 @@ describe('Fast Action Button service', () => {
       expect(authService.has.args).to.have.deep.members([
         [ 'can_view_call_action' ],
         [ [ 'can_view_message_action' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [  'can_update_contacts', 'can_create_places' ] ],
         [ 'can_edit' ],
         [ 'can_edit' ],
         [ 'can_edit' ],
@@ -421,8 +421,8 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(2);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
       ]);
       assertContactFormAction(actions[0], {
         id: 'place-1',
@@ -487,8 +487,8 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(2);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
       ]);
 
       assertContactFormAction(actions[0], {
@@ -522,8 +522,8 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(2);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
       ]);
 
       assertContactFormAction(actions[0], {
@@ -557,8 +557,8 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(0);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
       ]);
     });
 
@@ -575,8 +575,8 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(2);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
-        [ [ 'can_edit', 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
+        [ [ 'can_update_contacts', 'can_create_places' ] ],
       ]);
       assertContactFormAction(actions[0], {
         id: 'place-1',
@@ -714,7 +714,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(2);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_view_message_action', 'can_edit', 'can_update_contacts' ] ],
+        [ [ 'can_view_message_action', 'can_update_contacts' ] ],
         [ 'can_edit' ],
       ]);
 
@@ -804,7 +804,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(0);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_view_message_action', 'can_edit', 'can_update_contacts' ] ],
+        [ [ 'can_view_message_action', 'can_update_contacts' ] ],
         [ 'can_edit' ],
       ]);
     });
@@ -824,7 +824,7 @@ describe('Fast Action Button service', () => {
 
       expect(actions.length).to.equal(1);
       expect(authService.has.args).to.have.deep.members([
-        [ [ 'can_view_message_action', 'can_edit', 'can_update_contacts' ] ],
+        [ [ 'can_view_message_action', 'can_update_contacts' ] ],
       ]);
 
       assertSendMessageAction(actions[0], context.communicationContext);

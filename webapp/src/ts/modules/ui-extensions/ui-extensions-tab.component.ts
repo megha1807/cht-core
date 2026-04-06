@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgIf } from '@angular/common';
 
@@ -7,16 +7,16 @@ import { PerformanceService } from '@mm-services/performance.service';
 import { UiExtensionsService } from '@mm-services/ui-extensions.service';
 import { UserContactSummaryService } from '@mm-services/user-contact-summary.service';
 import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './ui-extensions-tab.component.html',
-  imports: [ToolBarComponent, NgIf]
+  imports: [ToolBarComponent, TranslatePipe, NgIf]
 })
-export class UiExtensionsTabComponent implements OnInit, AfterViewInit {
+export class UiExtensionsTabComponent implements AfterViewInit {
   @ViewChild('uiElementTab') container!: ElementRef;
-
+  extensionTitle = '';
   loading = true;
-  private extensionId = '';
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -26,43 +26,35 @@ export class UiExtensionsTabComponent implements OnInit, AfterViewInit {
     private readonly userContactSummaryService: UserContactSummaryService,
   ) {}
 
-  ngOnInit() {
-    this.extensionId = this.route.snapshot.params['id'];
-  }
-
   async ngAfterViewInit() {
     await this.initializeExtension();
   }
 
   private async initializeExtension() {
+    const extensionId = this.route.snapshot.params['id'];
     const trackRender = this.performanceService.track();
     try {
-      const extension = await this.uiExtensionsService.getExtension(this.extensionId);
-      if (!extension) {
-        return;
+      const { properties: { title, config }, Element } = await this.uiExtensionsService.getExtension(extensionId);
+      this.extensionTitle = title ?? '';
+      if (!customElements.get(extensionId)) {
+        customElements.define(extensionId, Element);
       }
-
-      const { properties, Element } = extension;
-
-      if (!customElements.get(this.extensionId)) {
-        customElements.define(this.extensionId, Element as any);
-      }
-      const element = document.createElement(this.extensionId);
+      const element = document.createElement(extensionId);
 
       Object.assign(element, {
         cht: await this.chtDatasourceService.get(),
         inputs: {
-          config: properties.config,
+          config,
           userContactSummary: await this.userContactSummaryService.get(),
         },
       });
 
       this.container.nativeElement.appendChild(element);
     } catch (error) {
-      console.error(`Error initializing UI extension: "${this.extensionId}"`, error);
+      console.error(`Error initializing UI extension: "${extensionId}"`, error);
     } finally {
       this.loading = false;
-      await trackRender?.stop({ name: `ui-extension:${this.extensionId}:render`, recordApdex: true });
+      await trackRender?.stop({ name: `ui-extension:${extensionId}:render` });
     }
   }
 }

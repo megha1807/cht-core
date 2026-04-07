@@ -71,6 +71,7 @@ describe('Edit ', () => {
 
     await loginPage.login(offlineUser);
     await commonPage.waitForPageLoaded();
+    await commonPage.closeReloadModal();
     await commonPage.goToPeople();
     await contactPage.selectLHSRowByText(healthCenter.name);
     await contactPage.waitForContactLoaded();

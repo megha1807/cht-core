@@ -17,7 +17,6 @@ import { TrainingCardsService } from '@mm-services/training-cards.service';
 import { ScrollLoaderProvider } from '@mm-providers/scroll-loader.provider';
 import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 describe('TrainingsComponent', () => {
   let fixture: ComponentFixture<TrainingsComponent>;
@@ -53,7 +52,6 @@ describe('TrainingsComponent', () => {
           TrainingsComponent,
           ModalLayoutComponent,
           TrainingCardsFormComponent,
-          MatIconTestingModule,
           EnketoComponent,
           ToolBarComponent,
         ],

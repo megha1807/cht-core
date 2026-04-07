@@ -37,7 +37,7 @@ import { FeedbackService } from '@mm-services/feedback.service';
 import { XmlFormsService } from '@mm-services/xml-forms.service';
 import { ReportsMoreMenuComponent } from '@mm-modules/reports/reports-more-menu.component';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 
 describe('Reports Component', () => {
   let component: ReportsComponent;
@@ -136,7 +136,6 @@ describe('Reports Component', () => {
           ReportsContentComponent,
           ReportsMoreMenuComponent,
           NavigationComponent,
-          MatIconTestingModule,
         ],
         providers: [
           provideMockStore({ selectors: mockedSelectors }),

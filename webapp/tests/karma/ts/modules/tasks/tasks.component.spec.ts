@@ -24,7 +24,7 @@ import { SessionService } from '@mm-services/session.service';
 import { DbService } from '@mm-services/db.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 
 describe('TasksComponent', () => {
   let getComponent;
@@ -62,7 +62,6 @@ describe('TasksComponent', () => {
         RouterTestingModule,
         MatIconModule,
         TasksComponent,
-        MatIconTestingModule,
         TasksSidebarFilterComponent,
         NavigationComponent,
         ToolBarComponent,

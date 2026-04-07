@@ -14,7 +14,6 @@ import { SessionService } from '@mm-services/session.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { GlobalActions } from '@mm-actions/global';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 describe('Analytics Filter Component', () => {
   let component: AnalyticsFilterComponent;
@@ -57,7 +56,6 @@ describe('Analytics Filter Component', () => {
         imports: [
           TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
           MatIconModule,
-          MatIconTestingModule,
           AnalyticsFilterComponent,
         ],
         providers: [

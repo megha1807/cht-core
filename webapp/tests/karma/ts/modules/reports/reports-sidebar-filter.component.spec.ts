@@ -20,7 +20,7 @@ import { ReportsSidebarFilterComponent } from '@mm-modules/reports/reports-sideb
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { GlobalActions } from '@mm-actions/global';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 
 describe('Reports Sidebar Filter Component', () => {
   let component: ReportsSidebarFilterComponent;
@@ -54,7 +54,6 @@ describe('Reports Sidebar Filter Component', () => {
           BrowserAnimationsModule,
           BsDropdownModule,
           MatIconModule,
-          MatIconTestingModule,
           ReportsSidebarFilterComponent,
           DateFilterComponent,
           FacilityFilterComponent,

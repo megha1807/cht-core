@@ -12,7 +12,7 @@ import { PlaceHierarchyService } from '@mm-services/place-hierarchy.service';
 import { GlobalActions } from '@mm-actions/global';
 import { Selectors } from '@mm-selectors/index';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
+
 
 describe('TasksSidebarFilterComponent', () => {
   let component: TasksSidebarFilterComponent;
@@ -34,7 +34,6 @@ describe('TasksSidebarFilterComponent', () => {
       imports: [
         TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: TranslateFakeLoader } }),
         MatIconModule,
-        MatIconTestingModule,
         TasksSidebarFilterComponent,
       ],
       providers: [

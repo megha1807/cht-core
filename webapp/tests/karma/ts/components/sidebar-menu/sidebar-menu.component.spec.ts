@@ -19,7 +19,6 @@ import { GlobalActions } from '@mm-actions/global';
 import { LogoutConfirmComponent } from '@mm-modals/logout/logout-confirm.component';
 import { FeedbackComponent } from '@mm-modals/feedback/feedback.component';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 describe('SidebarMenuComponent', () => {
   let component: SidebarMenuComponent;
@@ -43,7 +42,6 @@ describe('SidebarMenuComponent', () => {
           MatSidenavModule,
           MatIconModule,
           SidebarMenuComponent,
-          MatIconTestingModule,
           PanelHeaderComponent,
           AuthDirective,
         ],

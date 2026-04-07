@@ -96,9 +96,6 @@ export class ContactsMoreMenuComponent implements OnInit, OnDestroy {
   }
 
   private getUserSettings() {
-    if (this.userSettings) {
-      return;
-    }
     return this.userSettingsService
       .get()
       .then(userSettings => this.userSettings = userSettings)

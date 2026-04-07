@@ -88,9 +88,11 @@ export class ContactsMoreMenuComponent implements OnInit, OnDestroy {
   }
 
   private async checkPermissions() {
-    this.hasEditPermission = await this.authService.has('can_update_contacts');
-    this.hasDeletePermission = await this.authService.has('can_delete_contacts');
-    this.hasExportPermission = await this.authService.any([[ 'can_export_all' ], [ 'can_export_contacts' ]]);
+    [this.hasEditPermission, this.hasDeletePermission, this.hasExportPermission] = await Promise.all([
+      this.authService.has('can_update_contacts'),
+      this.authService.has('can_delete_contacts'),
+      this.authService.any([[ 'can_export_all' ], [ 'can_export_contacts' ]]),
+    ]);
   }
 
   private getUserSettings() {

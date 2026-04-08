@@ -37,8 +37,6 @@ import { FeedbackService } from '@mm-services/feedback.service';
 import { XmlFormsService } from '@mm-services/xml-forms.service';
 import { ReportsMoreMenuComponent } from '@mm-modules/reports/reports-more-menu.component';
 
-
-
 describe('Reports Component', () => {
   let component: ReportsComponent;
   let fixture: ComponentFixture<ReportsComponent>;
@@ -165,9 +163,6 @@ describe('Reports Component', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(ReportsComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

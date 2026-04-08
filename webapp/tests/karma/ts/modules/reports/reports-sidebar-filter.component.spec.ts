@@ -20,8 +20,6 @@ import { ReportsSidebarFilterComponent } from '@mm-modules/reports/reports-sideb
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { GlobalActions } from '@mm-actions/global';
 
-
-
 describe('Reports Sidebar Filter Component', () => {
   let component: ReportsSidebarFilterComponent;
   let fixture: ComponentFixture<ReportsSidebarFilterComponent>;
@@ -70,9 +68,6 @@ describe('Reports Sidebar Filter Component', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(ReportsSidebarFilterComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

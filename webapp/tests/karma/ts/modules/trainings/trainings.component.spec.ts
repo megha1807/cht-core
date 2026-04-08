@@ -17,7 +17,6 @@ import { TrainingCardsService } from '@mm-services/training-cards.service';
 import { ScrollLoaderProvider } from '@mm-providers/scroll-loader.provider';
 import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
 
-
 describe('TrainingsComponent', () => {
   let fixture: ComponentFixture<TrainingsComponent>;
   let component: TrainingsComponent;
@@ -70,9 +69,6 @@ describe('TrainingsComponent', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(TrainingsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

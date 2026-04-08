@@ -17,7 +17,6 @@ import { SettingsService } from '@mm-services/settings.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { GlobalActions } from '@mm-actions/global';
 
-
 describe('Analytics Sidebar Filter Component', () => {
   let component: AnalyticsSidebarFilterComponent;
   let fixture: ComponentFixture<AnalyticsSidebarFilterComponent>;

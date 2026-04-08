@@ -14,7 +14,6 @@ import { SessionService } from '@mm-services/session.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { GlobalActions } from '@mm-actions/global';
 
-
 describe('Analytics Filter Component', () => {
   let component: AnalyticsFilterComponent;
   let fixture: ComponentFixture<AnalyticsFilterComponent>;

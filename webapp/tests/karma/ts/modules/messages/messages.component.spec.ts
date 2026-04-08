@@ -26,8 +26,6 @@ import { PerformanceService } from '@mm-services/performance.service';
 import { ExportService } from '@mm-services/export.service';
 import { AuthService } from '@mm-services/auth.service';
 
-
-
 describe('Messages Component', () => {
   let component: MessagesComponent;
   let fixture: ComponentFixture<MessagesComponent>;
@@ -96,9 +94,6 @@ describe('Messages Component', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(MessagesComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

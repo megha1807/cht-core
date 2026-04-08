@@ -24,8 +24,6 @@ import { SessionService } from '@mm-services/session.service';
 import { DbService } from '@mm-services/db.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 
-
-
 describe('TasksComponent', () => {
   let getComponent;
   let changesService;
@@ -85,9 +83,6 @@ describe('TasksComponent', () => {
 
     getComponent = () => {
       return TestBed.compileComponents().then(() => {
-
-
-
         fixture = TestBed.createComponent(TasksComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

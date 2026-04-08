@@ -31,8 +31,6 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { SearchTelemetryService } from '@mm-services/search-telemetry.service';
 
-
-
 describe('Contacts content component', () => {
   let component: ContactsContentComponent;
   let fixture: ComponentFixture<ContactsContentComponent>;

@@ -34,7 +34,6 @@ import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
 import { SearchBarComponent } from '@mm-components/search-bar/search-bar.component';
 import { PerformanceService } from '@mm-services/performance.service';
 
-
 describe('Contacts component', () => {
   let searchResults;
   let component;
@@ -156,9 +155,6 @@ describe('Contacts component', () => {
         ]
       })
       .compileComponents().then(() => {
-
-
-
         fixture = TestBed.createComponent(ContactsComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

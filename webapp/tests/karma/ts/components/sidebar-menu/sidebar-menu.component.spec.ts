@@ -19,7 +19,6 @@ import { GlobalActions } from '@mm-actions/global';
 import { LogoutConfirmComponent } from '@mm-modals/logout/logout-confirm.component';
 import { FeedbackComponent } from '@mm-modals/feedback/feedback.component';
 
-
 describe('SidebarMenuComponent', () => {
   let component: SidebarMenuComponent;
   let fixture: ComponentFixture<SidebarMenuComponent>;

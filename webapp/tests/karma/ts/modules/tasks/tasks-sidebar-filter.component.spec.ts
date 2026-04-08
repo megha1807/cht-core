@@ -12,8 +12,6 @@ import { PlaceHierarchyService } from '@mm-services/place-hierarchy.service';
 import { GlobalActions } from '@mm-actions/global';
 import { Selectors } from '@mm-selectors/index';
 
-
-
 describe('TasksSidebarFilterComponent', () => {
   let component: TasksSidebarFilterComponent;
   let fixture: ComponentFixture<TasksSidebarFilterComponent>;
@@ -48,9 +46,6 @@ describe('TasksSidebarFilterComponent', () => {
         { provide: PlaceHierarchyService, useValue: placeHierarchyService },
       ],
     }).compileComponents();
-
-
-
 
     fixture = TestBed.createComponent(TasksSidebarFilterComponent);
     component = fixture.componentInstance;

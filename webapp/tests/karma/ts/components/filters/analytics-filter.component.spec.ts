@@ -69,9 +69,6 @@ describe('Analytics Filter Component', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(AnalyticsFilterComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

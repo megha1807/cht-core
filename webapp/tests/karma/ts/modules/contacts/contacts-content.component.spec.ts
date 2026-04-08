@@ -150,9 +150,6 @@ describe('Contacts content component', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(ContactsContentComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

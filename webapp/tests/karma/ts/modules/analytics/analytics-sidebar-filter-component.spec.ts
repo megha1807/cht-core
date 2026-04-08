@@ -63,9 +63,6 @@ describe('Analytics Sidebar Filter Component', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(AnalyticsSidebarFilterComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

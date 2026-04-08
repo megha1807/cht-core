@@ -18,8 +18,6 @@ import { SessionService } from '@mm-services/session.service';
 import { TelemetryService } from '@mm-services/telemetry.service';
 import { UserSettingsService } from '@mm-services/user-settings.service';
 
-
-
 describe('AnalyticsComponent', () => {
   let component: AnalyticsComponent;
   let fixture: ComponentFixture<AnalyticsComponent>;
@@ -70,9 +68,6 @@ describe('AnalyticsComponent', () => {
       })
       .compileComponents()
       .then(() => {
-
-
-
         fixture = TestBed.createComponent(AnalyticsComponent);
         component = fixture.componentInstance;
         store = TestBed.inject(MockStore);

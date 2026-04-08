@@ -217,7 +217,8 @@ describe('About Component', () => {
   it('should handle failure to get service worker app version', fakeAsync(() => {
     versionService.getLocal.resolves({ version: '3.5.0', rev: '12' });
     versionService.getRemoteRev.resolves('15');
-    versionService.getServiceWorker.callsFake(() => Promise.reject(new Error('SW not available')));
+    versionService.getServiceWorker.reset();
+    versionService.getServiceWorker.rejects(new Error('SW not available'));
 
     component.ngOnInit();
     flush();
@@ -229,7 +230,8 @@ describe('About Component', () => {
   it('should not set appVersion when service worker returns no version field', fakeAsync(() => {
     versionService.getLocal.resolves({ version: '3.5.0', rev: '12' });
     versionService.getRemoteRev.resolves('15');
-    versionService.getServiceWorker.callsFake(() => Promise.resolve({}));
+    versionService.getServiceWorker.reset();
+    versionService.getServiceWorker.resolves({});
 
     component.ngOnInit();
     flush();

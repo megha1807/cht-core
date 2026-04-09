@@ -130,6 +130,7 @@ export class AboutComponent implements OnInit, OnDestroy {
       })
       .then(rev => this.remoteRev = rev);
 
+    this.appVersion = undefined;
     this.versionService
       .getServiceWorker()
       .then(({ version }) => {

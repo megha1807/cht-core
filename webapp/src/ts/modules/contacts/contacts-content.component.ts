@@ -82,6 +82,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
   childContactTypes;
   filteredTasks = [];
   filteredReports: any[] = [];
+  summaryCards: any[] = [];
   DISPLAY_LIMIT = 50;
 
   constructor(
@@ -199,7 +200,8 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
       if (this.selectedContact?._id !== selectedContact?._id) {
         this.resetTaskAndReportsFilter();
       }
-      this.selectedContact = this.withInitializedCards(selectedContact);
+      this.selectedContact = selectedContact;
+      this.summaryCards = (selectedContact?.summary?.cards ?? []).map(card => ({ ...card }));
       this.loadingContent = loadingContent;
       this.forms = forms;
       this.loadingSelectedContactReports = loadingSelectedContactReports;
@@ -234,11 +236,9 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
         }
         this.selectedContact = {
           ...this.selectedContact,
-          summary: {
-            ...summary,
-            cards: summary.cards ? this.initializeCards(summary.cards) : summary.cards
-          }
+          summary
         };
+        this.summaryCards = (summary.cards ?? []).map(card => ({ ...card }));
         this.subscribeToSelectedContactXmlForms();
       });
     this.subscriptions.add(contactSummarySubscription);

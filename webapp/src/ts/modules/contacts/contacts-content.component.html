@@ -44,7 +44,7 @@
         </div>
 
         <ng-container *ngIf="selectedContact?.summary">
-          <div *ngFor="let card of selectedContact?.summary?.cards">
+          <div *ngFor="let card of summaryCards">
             <div class="card compact-card" [attr.test-id]="card.label">
               <button
               type="button"

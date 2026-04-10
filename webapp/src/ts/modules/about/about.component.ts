@@ -54,6 +54,7 @@ export class AboutComponent implements OnInit, OnDestroy {
   androidDeviceInfo;
   version;
   appVersion;
+  versionMismatch = false;
   localRev;
   remoteRev;
   dbInfo;
@@ -112,11 +113,12 @@ export class AboutComponent implements OnInit, OnDestroy {
   }
 
   private getVersionAndRevisions() {
-    this.versionService
+    const localVersionPromise = this.versionService
       .getLocal()
       .then(({ version, rev }) => {
         this.version = version;
         this.localRev = rev;
+        return version;
       })
       .catch(error => {
         console.error('Could not access local version', error);
@@ -131,13 +133,24 @@ export class AboutComponent implements OnInit, OnDestroy {
       .then(rev => this.remoteRev = rev);
 
     this.appVersion = undefined;
-    this.versionService
+    const serviceWorkerPromise = this.versionService
       .getServiceWorker()
       .then(({ version }) => {
         this.appVersion = version;
+        return version;
       })
       .catch(error => {
         console.debug('Could not access service worker app version', error);
+      });
+
+    Promise.all([localVersionPromise, serviceWorkerPromise])
+      .then(([localVersion, serviceWorkerVersion]) => {
+        if (localVersion && serviceWorkerVersion && localVersion !== serviceWorkerVersion) {
+          this.versionMismatch = true;
+          console.error('Version mismatch: app version and service worker version are different.');
+        } else {
+          this.versionMismatch = false;
+        }
       });
   }
 

@@ -1,7 +1,6 @@
 const utils = require('@utils');
 const commonPage = require('@page-objects/default/common/common.wdio.page');
 const loginPage = require('@page-objects/default/login/login.wdio.page');
-const analyticsPage = require('@page-objects/default/analytics/analytics.wdio.page');
 const userFactory = require('@factories/cht/users/users');
 const placeFactory = require('@factories/cht/contacts/place');
 const personFactory = require('@factories/cht/contacts/person');
@@ -21,11 +20,9 @@ describe('Targets widgets', () => {
 
   // Fewer patients with focused, extreme widget states
   const numberOfPatients = 6;
-  const patients = Array.from({ length: numberOfPatients }, () =>
-    personFactory.build({
-      parent: { _id: healthCenter._id, parent: healthCenter.parent }
-    })
-  );
+  const patients = Array.from({ length: numberOfPatients }, () => personFactory.build({
+    parent: { _id: healthCenter._id, parent: healthCenter.parent }
+  }));
 
   const reports = [
     // All patients have 0 ANC visits → shows 0% percentage widget

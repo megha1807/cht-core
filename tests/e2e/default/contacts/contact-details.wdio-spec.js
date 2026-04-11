@@ -201,17 +201,20 @@ describe('Contact details page.', () => {
       const cardHeader = await $('.compact-card .action-header');
       const cardFields = await $('.compact-card .row.flex.grid');
 
+      await cardFields.waitForDisplayed({ timeout: 10000 });
       
       expect(await cardFields.isDisplayed()).to.be.true;
       expect(await cardHeader.getAttribute('aria-expanded')).to.equal('true');
 
       
       await cardHeader.click();
+      await cardFields.waitForDisplayed({ timeout: 5000, reverse: true });
       expect(await cardFields.isDisplayed()).to.be.false;
       expect(await cardHeader.getAttribute('aria-expanded')).to.equal('false');
 
       
       await cardHeader.click();
+      await cardFields.waitForDisplayed({ timeout: 5000 });
       expect(await cardFields.isDisplayed()).to.be.true;
       expect(await cardHeader.getAttribute('aria-expanded')).to.equal('true');
     });

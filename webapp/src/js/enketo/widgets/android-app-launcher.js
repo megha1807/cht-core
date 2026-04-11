@@ -184,7 +184,7 @@ const setOutputFields = (group, data) => {
 };
 
 const assignPrimitiveArrayToField = (input, inputName, valueArray) => {
-  if (!input || !valueArray?.length) {
+  if (!input || !valueArray || !valueArray.length) {
     return;
   }
   $(input)

@@ -502,7 +502,7 @@ describe('Android App Launcher Widget', () => {
 
       const appSettings = createFields({
         '/main/app/action': 'org.example.action.VIEW'
-     });
+      });
       const $outputs = createGroup(
         'or-appearance-android-app-outputs',
         '/main/app/outputs',

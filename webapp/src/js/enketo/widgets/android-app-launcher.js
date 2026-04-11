@@ -178,13 +178,13 @@ const setOutputFields = (group, data) => {
     if (Array.isArray(value) && value.every(item => !_isPlainObject(item))) {
       assignPrimitiveArrayToField(input, inputName, value);
     } else {  
-    assignValueToInput(input, inputName, data[inputName]);
+      assignValueToInput(input, inputName, data[inputName]);
     }
   });
 };
 
 const assignPrimitiveArrayToField = (input, inputName, valueArray) => {
-  if (!input || !valueArray || !valueArray.length) {
+  if (!input || !valueArray?.length) {
     return;
   }
   $(input)

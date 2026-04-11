@@ -174,8 +174,22 @@ const setOutputFields = (group, data) => {
 
   $fields.each((index, input) => {
     const inputName = getElementName(input);
+    const value = data[inputName];
+    if (Array.isArray(value) && value.every(item => !_isPlainObject(item))) {
+      assignPrimitiveArrayToField(input, inputName, value);
+    } else {  
     assignValueToInput(input, inputName, data[inputName]);
+    }
   });
+};
+
+const assignPrimitiveArrayToField = (input, inputName, valueArray) => {
+  if (!input || !valueArray || !valueArray.length) {
+    return;
+  }
+  $(input)
+    .val(valueArray.join(' '))
+    .trigger('change');
 };
 
 const assignDataValueToRepeatGroup = (itemGroupIndex, itemGroup, dataProperty, dataValueList) => {

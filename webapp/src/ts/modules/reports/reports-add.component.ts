@@ -201,6 +201,19 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.getAttachment(docId, legacyAttachmentName);
   }
 
+  private getPreviewElement(acceptType: string, base64: string) {
+    if (acceptType === 'image/*') {
+      return '<img src="data:' + base64 + '">';
+    }
+    if (acceptType === 'audio/*') {
+      return '<audio src="data:' + base64 + '" controls></audio>';
+    }
+    if (acceptType === 'video/*') {
+      return '<video src="data:' + base64 + '" controls></video>';
+    }
+    return null;
+  } 
+
   private renderAttachmentPreviews(model) {
     return Promise
       .resolve()
@@ -216,14 +229,10 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
               .find('.file-feedback')
               .empty();
 
-            //  Support rendering image, audio, and video previews when editing reports
+            // Support rendering image, audio, and video previews when editing reports
             // https://github.com/medic/cht-core/issues/9165
             const acceptType = $element.attr('accept');
-            const isImage = acceptType === 'image/*';
-            const isAudio = acceptType === 'audio/*';
-            const isVideo = acceptType === 'video/*';
-
-            if (!isImage && !isAudio && !isVideo) {
+            if (!['image/*', 'audio/*', 'video/*'].includes(acceptType)) {
               return;
             }
 
@@ -233,17 +242,11 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
             }
 
             const base64 = await this.fileReaderService.base64(attachmentBlob);
+            const previewElement = this.getPreviewElement(acceptType, base64);
 
             const $preview = $picker.find('.file-preview');
             $preview.empty();
-
-            if (isImage) {
-              $preview.append('<img src="data:' + base64 + '">');
-            } else if (isAudio) {
-              $preview.append('<audio src="data:' + base64 + '" controls></audio>');
-            } else if (isVideo) {
-              $preview.append('<video src="data:' + base64 + '" controls></video>');
-            }
+            $preview.append(previewElement);
           })));
   }
 

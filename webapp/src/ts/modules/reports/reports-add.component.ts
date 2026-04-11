@@ -241,7 +241,7 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
               return;
             }
 
-            const base64 = await this.fileReaderService.base64(attachmentBlob);
+            const base64 = await this.fileReaderService.base64(attachmentBlob) as string;
             const previewElement = this.getPreviewElement(acceptType, base64);
             if (!previewElement) {
               return;

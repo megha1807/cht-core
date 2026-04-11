@@ -480,7 +480,7 @@ describe('Reports Add Component', () => {
         expect(fileReaderService.base64.notCalled).to.be.true;
         expect(jqPreviewElement.empty.notCalled).to.be.true;
         expect(jqPreviewElement.append.notCalled).to.be.true;
-   }));
+      }));
 
       it('loads form with image when there is an error retrieving the attachment', fakeAsync(async () => {
         route.snapshot.params = { reportId: 'my_report' };
@@ -567,7 +567,8 @@ describe('Reports Add Component', () => {
         expect(fileReaderService.base64.calledOnceWithExactly(attachmentBlob)).to.be.true;
         expect(jqStub.calledWith('.file-preview')).to.be.true;
         expect(jqPreviewElement.empty.calledOnce).to.be.true;
-        expect(jqPreviewElement.append.calledOnceWithExactly(`<audio src="data:${base64}" controls></audio>`)).to.be.true;
+        const audioHtml = `<audio src="data:${base64}" controls></audio>`;
+        expect(jqPreviewElement.append.calledOnceWithExactly(audioHtml)).to.be.true;
       }));
 
       it('loads form with video attachment and loaded file name', fakeAsync(async () => {
@@ -597,7 +598,8 @@ describe('Reports Add Component', () => {
         expect(fileReaderService.base64.calledOnceWithExactly(attachmentBlob)).to.be.true;
         expect(jqStub.calledWith('.file-preview')).to.be.true;
         expect(jqPreviewElement.empty.calledOnce).to.be.true;
-        expect(jqPreviewElement.append.calledOnceWithExactly(`<video src="data:${base64}" controls></video>`)).to.be.true;
+        const videoHtml = `<video src="data:${base64}" controls></video>`;
+        expect(jqPreviewElement.append.calledOnceWithExactly(videoHtml)).to.be.true;
       }));
     });
   });

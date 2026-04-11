@@ -238,9 +238,9 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
             $preview.empty();
 
             if (isImage) {
-               $preview.append('<img src="data:' + base64 + '">');
+              $preview.append('<img src="data:' + base64 + '">');
             } else if (isAudio) {
-                $preview.append('<audio src="data:' + base64 + '" controls></audio>');
+              $preview.append('<audio src="data:' + base64 + '" controls></audio>');
             } else if (isVideo) {
               $preview.append('<video src="data:' + base64 + '" controls></video>');
             }

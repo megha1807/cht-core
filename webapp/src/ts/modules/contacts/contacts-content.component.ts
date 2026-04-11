@@ -204,7 +204,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
       this.summaryCards = (selectedContact?.summary?.cards ?? []).map(card => ({ 
         ...card,
         collapsed: card.collapsed === true
-       }));
+      }));
       this.loadingContent = loadingContent;
       this.forms = forms;
       this.loadingSelectedContactReports = loadingSelectedContactReports;
@@ -244,7 +244,7 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
         this.summaryCards = (summary.cards ?? []).map(card => ({ 
           ...card,
           collapsed: card.collapsed === true
-         }));
+        }));
         this.subscribeToSelectedContactXmlForms();
       });
     this.subscriptions.add(contactSummarySubscription);

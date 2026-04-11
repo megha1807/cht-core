@@ -231,7 +231,7 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
 
             // Support rendering image, audio, and video previews when editing reports
             // https://github.com/medic/cht-core/issues/9165
-            const acceptType = $element.attr('accept');
+            const acceptType = $element.attr('accept') ?? '';
             if (!['image/*', 'audio/*', 'video/*'].includes(acceptType)) {
               return;
             }
@@ -243,6 +243,9 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
 
             const base64 = await this.fileReaderService.base64(attachmentBlob);
             const previewElement = this.getPreviewElement(acceptType, base64);
+            if (!previewElement) {
+              return;
+            }
 
             const $preview = $picker.find('.file-preview');
             $preview.empty();

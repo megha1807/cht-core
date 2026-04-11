@@ -216,9 +216,14 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
               .find('.file-feedback')
               .empty();
 
-            // Currently only support rendering image previews when editing reports
+            //  Support rendering image, audio, and video previews when editing reports
             // https://github.com/medic/cht-core/issues/9165
-            if ($element.attr('accept') !== 'image/*') {
+            const acceptType = $element.attr('accept');
+            const isImage = acceptType === 'image/*';
+            const isAudio = acceptType === 'audio/*';
+            const isVideo = acceptType === 'video/*';
+
+            if (!isImage && !isAudio && !isVideo) {
               return;
             }
 
@@ -231,7 +236,14 @@ export class ReportsAddComponent implements OnInit, OnDestroy, AfterViewInit {
 
             const $preview = $picker.find('.file-preview');
             $preview.empty();
-            $preview.append('<img src="data:' + base64 + '">');
+
+            if (isImage) {
+               $preview.append('<img src="data:' + base64 + '">');
+            } else if (isAudio) {
+                $preview.append('<audio src="data:' + base64 + '" controls></audio>');
+            } else if (isVideo) {
+              $preview.append('<video src="data:' + base64 + '" controls></video>');
+            }
           })));
   }
 

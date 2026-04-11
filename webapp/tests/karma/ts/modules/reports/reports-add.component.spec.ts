@@ -457,7 +457,7 @@ describe('Reports Add Component', () => {
         expect(jqPreviewElement.append.calledOnceWithExactly(`<img src="data:${base64}">`)).to.be.true;
       }));
 
-      it('loads form with non-image attachment', fakeAsync(async () => {
+      it('loads form with unsupported attachment type', fakeAsync(async () => {
         route.snapshot.params = { reportId: 'my_report' };
         const doc = { _id: 'report-id', form: 'my-form' };
         lineageModelGeneratorService.report.resolves({ doc });
@@ -469,8 +469,8 @@ describe('Reports Add Component', () => {
         expect(jqMap.calledOnce).to.be.true;
 
         const renderAttachmentPreview = jqMap.args[0][0];
-        const attachmentName = 'Screenshot-12_3_42.png';
-        const inputElement = getFileInputHTML('video/*', attachmentName);
+        const attachmentName = 'some-file.pdf';
+        const inputElement = getFileInputHTML('application/pdf', attachmentName);
         await renderAttachmentPreview(0, inputElement);
 
         expect(jqStub.calledWith('.widget.file-picker')).to.be.true;
@@ -480,7 +480,7 @@ describe('Reports Add Component', () => {
         expect(fileReaderService.base64.notCalled).to.be.true;
         expect(jqPreviewElement.empty.notCalled).to.be.true;
         expect(jqPreviewElement.append.notCalled).to.be.true;
-      }));
+   }));
 
       it('loads form with image when there is an error retrieving the attachment', fakeAsync(async () => {
         route.snapshot.params = { reportId: 'my_report' };
@@ -538,6 +538,66 @@ describe('Reports Add Component', () => {
         expect(jqStub.calledWith('.file-preview')).to.be.true;
         expect(jqPreviewElement.empty.calledOnce).to.be.true;
         expect(jqPreviewElement.append.calledOnceWithExactly(`<img src="data:${base64}">`)).to.be.true;
+      }));
+
+      it('loads form with audio attachment and loaded file name', fakeAsync(async () => {
+        route.snapshot.params = { reportId: 'my_report' };
+        const doc = { _id: 'report-id', form: 'my-form' };
+        lineageModelGeneratorService.report.resolves({ doc });
+        const attachmentBlob = { attachment: 'blob' };
+        dbService.getAttachment.resolves(attachmentBlob);
+        const base64 = 'base64';
+        fileReaderService.base64.resolves(base64);
+
+        component.ngAfterViewInit();
+        tick();
+
+        expect(jqStub.calledOnceWith(fileInputSelector)).to.be.true;
+        expect(jqMap.calledOnce).to.be.true;
+
+        const renderAttachmentPreview = jqMap.args[0][0];
+        const attachmentName = 'recording.mp3';
+        const inputElement = getFileInputHTML('audio/*', attachmentName);
+        await renderAttachmentPreview(0, inputElement);
+
+        expect(jqStub.calledWith('.widget.file-picker')).to.be.true;
+        expect(jqStub.calledWith('.file-feedback')).to.be.true;
+        expect(jqFeedbackElement.empty.calledOnceWithExactly()).to.be.true;
+        expect(dbService.getAttachment.calledOnceWithExactly(doc._id, `user-file-${attachmentName}`)).to.be.true;
+        expect(fileReaderService.base64.calledOnceWithExactly(attachmentBlob)).to.be.true;
+        expect(jqStub.calledWith('.file-preview')).to.be.true;
+        expect(jqPreviewElement.empty.calledOnce).to.be.true;
+        expect(jqPreviewElement.append.calledOnceWithExactly(`<audio src="data:${base64}" controls></audio>`)).to.be.true;
+      }));
+
+      it('loads form with video attachment and loaded file name', fakeAsync(async () => {
+        route.snapshot.params = { reportId: 'my_report' };
+        const doc = { _id: 'report-id', form: 'my-form' };
+        lineageModelGeneratorService.report.resolves({ doc });
+        const attachmentBlob = { attachment: 'blob' };
+        dbService.getAttachment.resolves(attachmentBlob);
+        const base64 = 'base64';
+        fileReaderService.base64.resolves(base64);
+
+        component.ngAfterViewInit();
+        tick();
+
+        expect(jqStub.calledOnceWith(fileInputSelector)).to.be.true;
+        expect(jqMap.calledOnce).to.be.true;
+
+        const renderAttachmentPreview = jqMap.args[0][0];
+        const attachmentName = 'clip.mp4';
+        const inputElement = getFileInputHTML('video/*', attachmentName);
+        await renderAttachmentPreview(0, inputElement);
+
+        expect(jqStub.calledWith('.widget.file-picker')).to.be.true;
+        expect(jqStub.calledWith('.file-feedback')).to.be.true;
+        expect(jqFeedbackElement.empty.calledOnceWithExactly()).to.be.true;
+        expect(dbService.getAttachment.calledOnceWithExactly(doc._id, `user-file-${attachmentName}`)).to.be.true;
+        expect(fileReaderService.base64.calledOnceWithExactly(attachmentBlob)).to.be.true;
+        expect(jqStub.calledWith('.file-preview')).to.be.true;
+        expect(jqPreviewElement.empty.calledOnce).to.be.true;
+        expect(jqPreviewElement.append.calledOnceWithExactly(`<video src="data:${base64}" controls></video>`)).to.be.true;
       }));
     });
   });

@@ -112,46 +112,38 @@ export class AboutComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getVersionAndRevisions() {
-    const localVersionPromise = this.versionService
-      .getLocal()
-      .then(({ version, rev }) => {
-        this.version = version;
-        this.localRev = rev;
-        return version;
-      })
-      .catch(error => {
-        console.error('Could not access local version', error);
-      });
+  private async getDeployVersion() {
+    try {
+      const { version, rev } = await this.versionService.getLocal();
+      this.version = version;
+      this.localRev = rev;
+    } catch (error) {
+      console.error('Could not access local version', error);
+      this.version = await this.translateService.get('app.version.unknown');
+    }
+  }
 
-    this.versionService
-      .getRemoteRev()
-      .catch(error => {
-        console.debug('Could not access remote ddoc rev', error);
-        return this.translateService.get('app.version.unknown');
-      })
-      .then(rev => this.remoteRev = rev);
+  private async getServiceWorkerVersion() {
+    try {
+      const { version } = await this.versionService.getServiceWorker();
+      this.appVersion = version;
+    } catch (error) {
+      console.debug('Could not access service worker app version', error);
+    }
+  }
 
+  private async getVersionAndRevisions() {
     this.appVersion = undefined;
-    const serviceWorkerPromise = this.versionService
-      .getServiceWorker()
-      .then(({ version }) => {
-        this.appVersion = version;
-        return version;
-      })
-      .catch(error => {
-        console.debug('Could not access service worker app version', error);
-      });
-
-    Promise.all([localVersionPromise, serviceWorkerPromise])
-      .then(([localVersion, serviceWorkerVersion]) => {
-        if (localVersion && serviceWorkerVersion && localVersion !== serviceWorkerVersion) {
-          this.versionMismatch = true;
-          console.error('Version mismatch: app version and service worker version are different.');
-        } else {
-          this.versionMismatch = false;
-        }
-      });
+    await Promise.all([
+      this.getDeployVersion(),
+      this.getServiceWorkerVersion(),
+    ]);
+    if (this.version && this.appVersion && this.version !== this.appVersion) {
+      this.versionMismatch = true;
+      console.error(`Version mismatch: deploy-info version (${this.version}) and service worker version (${this.appVersion}) are different.`);
+    } else {
+      this.versionMismatch = false;
+    }
   }
 
   private refreshAndroidDataUsage() {

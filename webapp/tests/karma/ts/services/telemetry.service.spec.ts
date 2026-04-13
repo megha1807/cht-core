@@ -179,11 +179,14 @@ describe('TelemetryService', () => {
       medicDb.query.resolves({ rows: [] });
       telemetryDb.query.resolves({ rows: [] });
 
+      // Simulate switching from user 'greg' to user 'jane' on the same day
+      // with existing telemetry DB for 'greg' but not 'jane'
       windowMock.indexedDB.databases.resolves([
-        '_pouch_telemetry-2018-11-10-greg',
+        '_pouch_telemetry-2018-11-10-greg',  // greg's telemetry DB exists
         '_pouch_some-other-db',
       ]);
 
+      // First, simulate that current user is 'jane', not 'greg'
       sessionService.userCtx.returns({ name: 'jane' });
 
       await service.record('test', 100);
@@ -191,6 +194,8 @@ describe('TelemetryService', () => {
       expect(consoleErrorSpy.notCalled).to.be.true;
       expect(telemetryDb.post.calledOnce).to.be.true;
       expect(telemetryDb.post.args[0][0]).to.deep.include({ key: 'test', value: 100 });
+      
+      // Should create a new DB for 'jane', not reuse 'greg's DB
       expect(windowMock.PouchDB.callCount).to.equal(1);
       expect(windowMock.PouchDB.args[0]).to.deep.equal(['telemetry-2018-11-10-jane']);
     });
@@ -328,34 +333,6 @@ describe('TelemetryService', () => {
       expect(consoleErrorSpy.notCalled).to.be.true;
     });
 
-    it('should include serviceWorker version in aggregated metadata', async () => {
-      windowMock.indexedDB.databases.resolves([
-        'telemetry-2018-11-09-greg',
-      ]);
-      setupDbMocks();
-      versionService.getServiceWorker.resolves({ version: '4.1.0' });
-
-      await service.record('test', 1);
-
-      const aggregatedDoc = metaDb.put.args[0][0];
-      expect(aggregatedDoc.metadata.versions.serviceWorker).to.equal('4.1.0');
-      expect(consoleErrorSpy.notCalled).to.be.true;
-    });
-
-    it('should set serviceWorker version to undefined when getServiceWorker rejects', async () => {
-      windowMock.indexedDB.databases.resolves([
-        'telemetry-2018-11-09-greg',
-      ]);
-      setupDbMocks();
-      versionService.getServiceWorker.rejects(new Error('SW not available'));
-
-      await service.record('test', 1);
-
-      const aggregatedDoc = metaDb.put.args[0][0];
-      expect(aggregatedDoc.metadata.versions.serviceWorker).to.be.undefined;
-      expect(consoleErrorSpy.notCalled).to.be.true;
-    });
-
     it('should not aggregate when recording the day the db was created and next day it should aggregate', async () => {
       windowMock.indexedDB.databases.resolves([
         'telemetry-2018-11-10-greg',
@@ -365,41 +342,44 @@ describe('TelemetryService', () => {
 
       await service.record('test', 10);
 
-      expect(telemetryDb.post.calledOnce).to.be.true;
+      expect(telemetryDb.post.calledOnce).to.be.true;   // Telemetry entry has been recorded
       expect(telemetryDb.post.args[0][0]).to.deep.include({ key: 'test', value: 10 });
-      expect(telemetryDb.query.notCalled).to.be.true;
-      expect(metaDb.put.notCalled).to.be.true;
+      expect(telemetryDb.query.notCalled).to.be.true;   // NO telemetry aggregation has
+      expect(metaDb.put.notCalled).to.be.true;          // been recorded yet
       expect(windowMock.PouchDB.calledOnce).to.be.true;
       expect(windowMock.PouchDB.args[0]).to.deep.equal([ 'telemetry-2018-11-10-greg' ]);
 
-      clock.tick('01:00');
+      clock.tick('01:00'); // 1 min later ...
       await service.record('test', 5);
 
-      expect(telemetryDb.post.calledTwice).to.be.true;
+      expect(telemetryDb.post.calledTwice).to.be.true;  // second call
       expect(telemetryDb.post.args[1][0]).to.deep.include({ key: 'test', value: 5 });
-      expect(telemetryDb.query.notCalled).to.be.true;
-      expect(metaDb.put.notCalled).to.be.true;
+      expect(telemetryDb.query.notCalled).to.be.true;   // still NO aggregation has
+      expect(metaDb.put.notCalled).to.be.true;          // been recorded (same day)
       expect(windowMock.PouchDB.calledTwice).to.be.true;
       expect(windowMock.PouchDB.args[0]).to.deep.equal([ 'telemetry-2018-11-10-greg' ]);
 
       let postCalledAfterQuery = false;
       telemetryDb.post.callsFake(() => postCalledAfterQuery = telemetryDb.query.called);
-      clock.tick('24:00:00');
+      clock.tick('24:00:00'); // 1 day later ...
       await service.record('test', 2);
 
-      expect(telemetryDb.post.calledThrice).to.be.true;
+      expect(telemetryDb.post.calledThrice).to.be.true; // third call
       expect(telemetryDb.post.args[2][0]).to.deep.include({ key: 'test', value: 2 });
-      expect(telemetryDb.query.calledOnce).to.be.true;
-      expect(metaDb.put.calledOnce).to.be.true;
+      expect(telemetryDb.query.calledOnce).to.be.true;  // Now aggregation HAS been performed
+      expect(metaDb.put.calledOnce).to.be.true;         // and the stats recorded
       expect(windowMock.PouchDB.callCount).to.equal(4);
       expect(windowMock.PouchDB.args[2]).to.deep.equal([ 'telemetry-2018-11-10-greg' ]);
       expect(windowMock.PouchDB.args[3]).to.deep.equal([ 'telemetry-2018-11-11-greg' ]);
 
+      // The telemetry record has been recorded after aggregation to not being included in the stats,
+      // because the record belong to the current date, not the day aggregated (yesterday)
       expect(postCalledAfterQuery).to.be.true;
 
       const aggregatedDoc = metaDb.put.args[0][0];
+      // Now is 2018-11-11 and aggregated telemetry for 2018-11-10
       expect(aggregatedDoc._id).to.match(/^telemetry-2018-11-10-greg-[\w-]+$/);
-      expect(telemetryDb.destroy.calledOnce).to.be.true;
+      expect(telemetryDb.destroy.calledOnce).to.be.true;   // is from the previous day
 
       console.warn(consoleErrorSpy.args);
       expect(consoleErrorSpy.notCalled).to.be.true;
@@ -414,48 +394,75 @@ describe('TelemetryService', () => {
       expect(telemetryDb.post.calledOnce).to.be.true;
       expect(windowMock.PouchDB.calledOnce).to.be.true;
       expect(windowMock.PouchDB.args[0]).to.deep.equal([ 'telemetry-2018-11-10-greg' ]);
-      expect(metaDb.put.notCalled).to.be.true;
+      expect(metaDb.put.notCalled).to.be.true;         // NO telemetry has been recorded yet
 
-      clock.tick('01:00');
+      clock.tick('01:00'); // 1 min later ...
       await service.record('another.datapoint');
 
-      expect(telemetryDb.post.calledTwice).to.be.true;
+      expect(telemetryDb.post.calledTwice).to.be.true; // second call
       expect(windowMock.PouchDB.calledTwice).to.be.true;
       expect(windowMock.PouchDB.args[0]).to.deep.equal([ 'telemetry-2018-11-10-greg' ]);
-      expect(metaDb.put.notCalled).to.be.true;
+      expect(metaDb.put.notCalled).to.be.true;         // still NO telemetry has been recorded (same day)
 
-      clock.tick('48:00:00');
+      clock.tick('48:00:00'); // 2 days later ...
       windowMock.indexedDB.databases.resolves([ 'telemetry-2018-11-10-greg' ]);
       await service.record('test', 2);
 
-      expect(telemetryDb.post.calledThrice).to.be.true;
+      expect(telemetryDb.post.calledThrice).to.be.true; // third call
       expect(windowMock.PouchDB.callCount).to.equal(4);
       expect(windowMock.PouchDB.args[2]).to.deep.equal([ 'telemetry-2018-11-10-greg' ]);
       expect(windowMock.PouchDB.args[3]).to.deep.equal([ 'telemetry-2018-11-12-greg' ]);
-      expect(metaDb.put.calledOnce).to.be.true;
+      expect(metaDb.put.calledOnce).to.be.true;       // Now telemetry IS recorded
 
       let aggregatedDoc = metaDb.put.args[0][0];
-      expect(aggregatedDoc._id).to.match(/^telemetry-2018-11-10-greg-[\w-]+$/);
-      expect(telemetryDb.destroy.calledOnce).to.be.true;
+      expect(aggregatedDoc._id).to.match(/^telemetry-2018-11-10-greg-[\w-]+$/);  // Today 2018-11-12 but aggregation is
+      expect(telemetryDb.destroy.calledOnce).to.be.true;                      // from 2 days ago (not Yesterday)
 
-      clock.tick(5 * 24 * 60 * 60 * 1000);
+      clock.tick(5 * 24 * 60 * 60 * 1000); // 5 more days later ...
       windowMock.indexedDB.databases.resolves([ 'telemetry-2018-11-12-greg' ]);
       await service.record('point.a', 1);
 
-      expect(telemetryDb.post.callCount).to.equal(4);
+      expect(telemetryDb.post.callCount).to.equal(4);       // 4th call
       expect(windowMock.PouchDB.callCount).to.equal(6);
       expect(windowMock.PouchDB.args[4]).to.deep.equal([ 'telemetry-2018-11-12-greg' ]);
       expect(windowMock.PouchDB.args[5]).to.deep.equal([ 'telemetry-2018-11-17-greg' ]);
-      expect(metaDb.put.calledTwice).to.be.true;
+      expect(metaDb.put.calledTwice).to.be.true;            // Telemetry IS recorded again
       aggregatedDoc = metaDb.put.args[1][0];
-      expect(aggregatedDoc._id).to.match(/^telemetry-2018-11-12-greg-[\w-]+$/);
+      expect(aggregatedDoc._id).to.match(/^telemetry-2018-11-12-greg-[\w-]+$/); // Now is Nov 17 but agg. is from Nov 12
 
-      clock.tick('02:00:00');
+      // A new record is added ...
+      clock.tick('02:00:00'); // 2 hours later ...
       windowMock.indexedDB.databases.resolves([]);
-      await service.record('point.b', 0);
-      expect(telemetryDb.post.callCount).to.equal(5);
-      expect(metaDb.put.calledTwice).to.be.true;
+      await service.record('point.b', 0); // 1 record added
+      // ...the aggregation count is the same because
+      // the aggregation was already performed 2 hours ago within the same day
+      expect(telemetryDb.post.callCount).to.equal(5);       // 5th call
+      expect(metaDb.put.calledTwice).to.be.true;            // Telemetry count is the same
 
+      expect(consoleErrorSpy.notCalled).to.be.true;
+    });
+
+    it('should include serviceWorker version in aggregated metadata', async () => {
+      windowMock.indexedDB.databases.resolves([
+        'telemetry-2018-11-09-greg',
+      ]);
+      setupDbMocks();
+      versionService.getServiceWorker.resolves({ version: '4.1.0' });
+      await service.record('test', 1);
+      const aggregatedDoc = metaDb.put.args[0][0];
+      expect(aggregatedDoc.metadata.versions.serviceWorker).to.equal('4.1.0');
+      expect(consoleErrorSpy.notCalled).to.be.true;
+    });
+
+    it('should set serviceWorker version to undefined when getServiceWorker rejects', async () => {
+      windowMock.indexedDB.databases.resolves([
+        'telemetry-2018-11-09-greg',
+      ]);
+      setupDbMocks();
+      versionService.getServiceWorker.rejects(new Error('SW not available'));
+      await service.record('test', 1);
+      const aggregatedDoc = metaDb.put.args[0][0];
+      expect(aggregatedDoc.metadata.versions.serviceWorker).to.be.undefined;
       expect(consoleErrorSpy.notCalled).to.be.true;
     });
   });

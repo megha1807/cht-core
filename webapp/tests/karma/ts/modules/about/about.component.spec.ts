@@ -212,6 +212,7 @@ describe('About Component', () => {
     discardPeriodicTasks();
 
     expect(component.appVersion).to.equal('4.5.0');
+    expect(component.version).to.equal('3.5.0');
   }));
 
   it('should handle failure to get service worker app version', fakeAsync(() => {

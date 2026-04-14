@@ -218,11 +218,19 @@ export class TelemetryService {
   }
 
   private async storeIt(db, key, value) {
-    return await db.post({
-      key: key,
-      value: value,
-      date_recorded: Date.now(),
-    });
+    try {
+      return await db.post({
+        key: key,
+        value: value,
+        date_recorded: Date.now(),
+      });
+    } catch (error) {
+      if (error?.name === 'InvalidStateError' || error?.message?.includes('IDBRequest')) {
+        console.warn('Telemetry storeIt skipped due to IDB state error', error);
+        return;
+      }
+      throw error;
+    }
   }
 
   private async submitIfNeeded(today: TodayMoment, telemetryDBs: string[] = []) {
@@ -238,18 +246,21 @@ export class TelemetryService {
         const dbNameParts = dbName.split(this.NAME_DIVIDER);
         if (dbNameParts.length >= 4) {
           const datePart = `${dbNameParts[1]}-${dbNameParts[2]}-${dbNameParts[3]}`;
-          
+
           // Don't submit today's telemetry records
           if (datePart === today.formatted) {
             continue;
           }
-          
+
+          let db;
           try {
-            const db = this.windowRef.PouchDB(dbName);
+            db = this.windowRef.PouchDB(dbName);
             await this.aggregate(db, dbName);
+            await db.close();
             await db.destroy();
           } catch (error) {
             console.error('Error when aggregating the telemetry records', error);
+            this.closeDataBase(db);
           }
         }
       }
@@ -304,7 +315,7 @@ export class TelemetryService {
    *                        aggregated if required
    * @memberof Telemetry
    */
-  record (key, value?) {
+  record(key, value?) {
     return this.ngZone.runOutsideAngular(() => this._record(key, value));
   }
 
@@ -323,6 +334,8 @@ export class TelemetryService {
       const databaseNames = databases?.map(db => db.name) || [];
       const telemetryDBs = await this.getTelemetryDBs(databaseNames);
       await this.submitIfNeeded(today, telemetryDBs);
+      // Small delay to allow any pending IDB transactions from aggregation/destroy to fully settle
+      await new Promise(resolve => setTimeout(resolve, 100));
       const currentDB = await this.getCurrentTelemetryDB(today);
       await this
         .storeIt(currentDB, key, value)

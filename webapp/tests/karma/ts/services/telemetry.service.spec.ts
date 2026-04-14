@@ -92,7 +92,7 @@ describe('TelemetryService', () => {
     consoleErrorSpy = sinon.spy(console, 'error');
     telemetryDb = {
       post: sinon.stub().resolves(),
-      close: sinon.stub(),
+      close: sinon.stub().resolves(),  // resolves because we now await db.close()
       query: sinon.stub(),
       destroy: sinon.stub().callsFake(() => {
         telemetryDb._destroyed = true;
@@ -190,7 +190,7 @@ describe('TelemetryService', () => {
       expect(consoleErrorSpy.notCalled).to.be.true;
       expect(telemetryDb.post.calledOnce).to.be.true;
       expect(telemetryDb.post.args[0][0]).to.deep.include({ key: 'test', value: 100 });
-      
+
       // Should create a new DB for 'jane', not reuse 'greg's DB
       expect(windowMock.PouchDB.callCount).to.equal(1);
       expect(windowMock.PouchDB.args[0]).to.deep.equal(['telemetry-2018-11-10-jane']);
@@ -322,7 +322,7 @@ describe('TelemetryService', () => {
       expect(medicDb.query.args[0][0]).to.equal('medic-client/doc_by_type');
       expect(medicDb.query.args[0][1]).to.deep.equal({ key: [ 'form' ], include_docs: true });
       expect(telemetryDb.destroy.calledTwice).to.be.true;
-      expect(telemetryDb.close.notCalled).to.be.true;
+      expect(telemetryDb.close.calledTwice).to.be.true;  // updated: close is now called before destroy
 
       expect(consoleErrorSpy.notCalled).to.be.true;
     });
@@ -435,7 +435,42 @@ describe('TelemetryService', () => {
 
       expect(consoleErrorSpy.notCalled).to.be.true;
     });
-  });
+
+    it('should handle InvalidStateError in storeIt gracefully', async () => {
+      const idbError = new Error('Failed to read the result property from IDBRequest');
+      idbError.name = 'InvalidStateError';
+      telemetryDb.post.rejects(idbError);
+      windowMock.indexedDB.databases.resolves([]);
+
+      await service.record('test-key', 1);
+
+      // Should not throw or log an error, just warn
+      expect(consoleErrorSpy.notCalled).to.be.true;
+    });
+
+    it('should close db before destroying during aggregation', async () => {
+      windowMock.indexedDB.databases.resolves([
+        'telemetry-2018-11-09-greg',
+      ]);
+      medicDb.query.resolves({ rows: [] });
+      telemetryDb.query.resolves({ rows: [] });
+      medicDb.info.resolves({ some: 'stats' });
+      metaDb.put.resolves();
+      medicDb.get.withArgs('_design/medic-client').resolves({
+        _id: '_design/medic-client',
+        build_info: { version: '3.0.0' }
+      });
+      medicDb.allDocs.resolves({ rows: [{ value: { rev: 'rev1' } }] });
+
+      await service.record('test', 1);
+
+      // close must be called before destroy
+      sinon.assert.callOrder(telemetryDb.close, telemetryDb.destroy);
+      expect(telemetryDb.close.calledOnce).to.be.true;
+      expect(telemetryDb.destroy.calledOnce).to.be.true;
+    });
+
+  });  // end describe('record()')
 
   describe('storeConflictedAggregate()', () => {
     it('should deal with conflicts by making the ID unique and noting the conflict in the new document', async () => {
@@ -472,7 +507,7 @@ describe('TelemetryService', () => {
       expect(metaDb.put.args[1][0]._id).to.match(/^telemetry-2018-11-5-greg-[\w-]+-conflicted-[\w-]+$/);
       expect(metaDb.put.args[1][0].metadata.conflicted).to.equal(true);
       expect(telemetryDb.destroy.calledOnce).to.be.true;
-      expect(telemetryDb.close.notCalled).to.be.true;
+      expect(telemetryDb.close.calledOnce).to.be.true;  // updated: close is now called before destroy
     });
   });
 

@@ -123,6 +123,15 @@ export class AboutComponent implements OnInit, OnDestroy {
     }
   }
 
+  private async getRemoteVersion() {
+    try {
+      this.remoteRev = await this.versionService.getRemoteRev();
+    } catch (error) {
+      console.debug('Could not access remote ddoc rev', error);
+      this.remoteRev = await this.translateService.get('app.version.unknown');
+    }
+  }
+
   private async getServiceWorkerVersion() {
     try {
       const { version } = await this.versionService.getServiceWorker();
@@ -136,6 +145,7 @@ export class AboutComponent implements OnInit, OnDestroy {
     this.appVersion = undefined;
     await Promise.all([
       this.getDeployVersion(),
+      this.getRemoteVersion(),
       this.getServiceWorkerVersion(),
     ]);
     if (this.version && this.appVersion && this.version !== this.appVersion) {

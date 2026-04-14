@@ -140,7 +140,9 @@ export class AboutComponent implements OnInit, OnDestroy {
     ]);
     if (this.version && this.appVersion && this.version !== this.appVersion) {
       this.versionMismatch = true;
-      console.error(`Version mismatch: deploy-info version (${this.version}) and service worker version (${this.appVersion}) are different.`);
+      const msg = `Version mismatch: deploy-info version (${this.version}) ` +
+        `and service worker version (${this.appVersion}) are different.`;
+      console.error(msg);
     } else {
       this.versionMismatch = false;
     }

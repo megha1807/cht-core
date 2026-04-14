@@ -334,8 +334,6 @@ export class TelemetryService {
       const databaseNames = databases?.map(db => db.name) || [];
       const telemetryDBs = await this.getTelemetryDBs(databaseNames);
       await this.submitIfNeeded(today, telemetryDBs);
-      // Small delay to allow any pending IDB transactions from aggregation/destroy to fully settle
-      await new Promise(resolve => setTimeout(resolve, 100));
       const currentDB = await this.getCurrentTelemetryDB(today);
       await this
         .storeIt(currentDB, key, value)

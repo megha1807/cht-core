@@ -105,7 +105,7 @@ const stripCountryCode = function(config, phone) {
   if (!countryCode) {
     return phone;
   }
-  const prefix = '+' + countryCode;
+  const prefix = '+' + String(countryCode);
   if (phone.startsWith(prefix)) {
     return phone.slice(prefix.length);
   }

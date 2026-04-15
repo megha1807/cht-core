@@ -1721,5 +1721,21 @@ describe('messageUtils', () => {
       const result = utils.template(config, translate, doc, content);
       expect(result).to.equal('Call ');
     });
+
+    it('works when default_country_code is numeric (not string)', () => {
+      const config = { default_country_code: 977 };
+      const doc = { locale: 'en' };
+      const content = { message: [{ locale: 'en', content: 'Call {{#local_phone}}+9779841234567{{/local_phone}}' }] };
+      const result = utils.template(config, translate, doc, content);
+      expect(result).to.equal('Call 9841234567');
+    });
+
+    it('returns phone unchanged if already in local format', () => {
+      const config = { default_country_code: '977' };
+      const doc = { locale: 'en' };
+      const content = { message: [{ locale: 'en', content: 'Call {{#local_phone}}9841234567{{/local_phone}}' }] };
+      const result = utils.template(config, translate, doc, content);
+      expect(result).to.equal('Call 9841234567');
+    });
   });
 });

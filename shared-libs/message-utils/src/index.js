@@ -101,7 +101,7 @@ const stripCountryCode = function(config, phone) {
   if (!phone) {
     return phone;
   }
-  const countryCode = config && config.default_country_code;
+  const countryCode = config?.default_country_code;
   if (!countryCode) {
     return phone;
   }

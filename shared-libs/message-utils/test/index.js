@@ -1692,7 +1692,8 @@ describe('messageUtils', () => {
     it('strips country code from a context variable', () => {
       const config = { default_country_code: '977' };
       const doc = { locale: 'en', fields: { facility_phone: '+9779841234567' } };
-      const content = { message: [{ locale: 'en', content: 'Call {{#local_phone}}{{facility_phone}}{{/local_phone}}' }] };
+      const content = { message: [{ locale: 'en', 
+        content: 'Call {{#local_phone}}{{facility_phone}}{{/local_phone}}' }] };
       const result = utils.template(config, translate, doc, content);
       expect(result).to.equal('Call 9841234567');
     });

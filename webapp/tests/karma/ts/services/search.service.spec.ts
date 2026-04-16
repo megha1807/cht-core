@@ -234,7 +234,12 @@ describe('Search service', () => {
         .then(result => {
           expect(searchStub.callCount).to.equal(1);
           expect(searchStub.args[0])
-            .to.deep.equal(['contacts', { settings: {} }, { limit: 50, skip: 0 }, { sortByLastVisitedDate: undefined }]);
+            .to.deep.equal([
+              'contacts', 
+              { settings: {} },
+              { limit: 50, skip: 0 }, 
+              { sortByLastVisitedDate: undefined  }
+            ]);
           expect(db.query.callCount).to.equal(2);
           expect(db.query.args[0]).to.deep.equal([
             'medic-client/visits_by_date',

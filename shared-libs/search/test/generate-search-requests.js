@@ -525,7 +525,6 @@ describe('GenerateSearchRequests service', () => {
     });
 
     it('contacts local phone search does not duplicate when normalized matches original', () => {
-      const settings = { default_country_code: '1' };
       const result = service('contacts', { search: '9779841234567', settings: { default_country_code: '977' } });
       chai.expect(result.length).to.equal(1);
     });

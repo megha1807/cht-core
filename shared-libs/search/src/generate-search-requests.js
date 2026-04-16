@@ -96,6 +96,22 @@ const freetextRequestParams = (word) => {
   return params;
 };
 
+const getNormalizedPhoneRequest = (word, settings, view) => {
+  if (!settings?.default_country_code) {
+    return null;
+  }
+  if (!PHONE_REGEX.test(word) || word.startsWith('+')) {
+    return null;
+  }
+  const normalized = phoneNumber.normalize(settings, word);
+  const stripped = normalized?.replace(/^\+/, '');
+  if (!stripped || stripped === word) {
+    return null;
+  }
+  const normalizedParams = freetextRequestParams(stripped);
+  return normalizedParams ? { view, params: normalizedParams, freetext: true } : null;
+};
+
 const freetextRequest = (filters, view) => {
   if (!filters.search) {
     return;
@@ -110,18 +126,10 @@ const freetextRequest = (filters, view) => {
       return [];
     }
     const result = [{ view, params, freetext: true }];
-
-    if (filters.settings && PHONE_REGEX.test(word) && !word.startsWith('+')) {
-      const normalized = phoneNumber.normalize(filters.settings, word);
-      const stripped = normalized && normalized.replace(/^\+/, '');
-      if (stripped && stripped !== word) {
-        const normalizedParams = freetextRequestParams(stripped);
-        if (normalizedParams) {
-          result.push({ view, params: normalizedParams, freetext: true });
-        }
-      }
+    const phoneRequest = getNormalizedPhoneRequest(word, filters.settings, view);
+    if (phoneRequest) {
+      result.push(phoneRequest);
     }
-
     return result;
   });
   return _.compact(requests);

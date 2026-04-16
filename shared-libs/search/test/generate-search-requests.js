@@ -523,6 +523,27 @@ describe('GenerateSearchRequests service', () => {
       chai.expect(keys).to.include('9841234567');
       chai.expect(keys).to.include('9779841234567');
     });
+
+    it('contacts local phone search does not duplicate when normalized matches original', () => {
+      const settings = { default_country_code: '1' };
+      const result = service('contacts', { search: '9779841234567', settings: { default_country_code: '977' } });
+      chai.expect(result.length).to.equal(1);
+    });
+
+    it('contacts freetext with type and startkey/endkey params (range query path)', () => {
+      const filters = {
+        search: 'som',
+        types: {
+          selected: [ 'clinic' ],
+          options: [ 'person', 'clinic', 'district_hospital' ]
+        }
+      };
+      const result = service('contacts', filters);
+      chai.expect(result.length).to.equal(1);
+      chai.expect(result[0].view).to.equal('contacts_by_type_freetext');
+      chai.expect(result[0].params.key).to.equal('som');
+      chai.expect(result[0].params.type).to.equal('clinic');
+    });
   });
 
   describe('shouldSortByLastVisitedDate', () => {

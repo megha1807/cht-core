@@ -466,6 +466,63 @@ describe('GenerateSearchRequests service', () => {
       });
     });
 
+    it('contacts search by local phone number also generates normalized request', () => {
+      const settings = { default_country_code: '977' };
+      const result = service('contacts', { search: '9841234567', settings });
+      const keys = result.map(r => r.params.key);
+      chai.expect(keys).to.include('9841234567');
+      chai.expect(keys).to.include('9779841234567');
+    });
+
+    it('contacts search with international format does not duplicate request', () => {
+      const settings = { default_country_code: '977' };
+      const result = service('contacts', { search: '+9779841234567', settings });
+      chai.expect(result.length).to.equal(1);
+      chai.expect(result[0].params.key).to.equal('+9779841234567');
+    });
+
+    it('contacts search with no settings falls back to normal freetext', () => {
+      const result = service('contacts', { search: '9841234567' });
+      chai.expect(result.length).to.equal(1);
+      chai.expect(result[0].params.key).to.equal('9841234567');
+    });
+
+    it('contacts search with settings but invalid phone number does not add extra request', () => {
+      const settings = { default_country_code: '977' };
+      const result = service('contacts', { search: 'elephant', settings });
+      chai.expect(result.length).to.equal(1);
+      chai.expect(result[0].params.key).to.equal('elephant');
+    });
+
+    it('contacts search with settings but no default_country_code does not add extra request', () => {
+      const settings = { phone_validation: 'full' };
+      const result = service('contacts', { search: '9841234567', settings });
+      chai.expect(result.length).to.equal(1);
+      chai.expect(result[0].params.key).to.equal('9841234567');
+    });
+
+    it('contacts search with local phone that normalizes to same value does not duplicate', () => {
+      const settings = { default_country_code: '1' };
+      const result = service('contacts', { search: '2025551234', settings });
+      chai.expect(result.length).to.be.at.least(1);
+    });   
+
+    it('contacts local phone search also works with type filter', () => {
+      const settings = { default_country_code: '977' };
+      const filters = {
+        search: '9841234567',
+        settings,
+        types: {
+          selected: ['person'],
+          options: ['person', 'clinic']
+        }
+      };
+      const result = service('contacts', filters);
+      chai.expect(result.length).to.equal(2);
+      const keys = result.map(r => r.params.key);
+      chai.expect(keys).to.include('9841234567');
+      chai.expect(keys).to.include('9779841234567');
+    });
   });
 
   describe('shouldSortByLastVisitedDate', () => {

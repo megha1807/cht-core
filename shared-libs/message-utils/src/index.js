@@ -353,7 +353,7 @@ const render = function(config, template, view, locale) {
     local_phone: function() {
       return function(text) {
         const phone = render(config, text, view);
-        return stripCountryCode(config, phone);
+        return stripCountryCode(config, phone.trim());
       };
     }
   }));

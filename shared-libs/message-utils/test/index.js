@@ -1737,5 +1737,14 @@ describe('messageUtils', () => {
       const result = utils.template(config, translate, doc, content);
       expect(result).to.equal('Call 9841234567');
     });
+
+    it('strips country code when phone variable has surrounding whitespace', () => {
+      const config = { default_country_code: '977' };
+      const doc = { locale: 'en', fields: { patient_phone: '+9779841234567' } };
+      const content = { message: [{ locale: 'en', 
+        content: 'Call {{#local_phone}} {{patient_phone}} {{/local_phone}}' }] };
+      const result = utils.template(config, translate, doc, content);
+      expect(result).to.equal('Call 9841234567');
+    });
   });
 });

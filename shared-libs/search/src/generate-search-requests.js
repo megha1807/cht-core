@@ -2,6 +2,8 @@ const _ = require('lodash/core');
 const moment = require('moment');
 
 const MINIMUM_SEARCH_TERM_LENGTH = 3;
+const phoneNumber = require('@medic/phone-number');
+const PHONE_REGEX = /^\+?[\d\s\-().]{7,}$/;
 
 const getKeysArray = (keys) => keys.map(key => [ key ]);
 
@@ -102,9 +104,25 @@ const freetextRequest = (filters, view) => {
     .trim()
     .toLowerCase()
     .split(/\s+/);
-  const requests = words.map((word) => {
+  const requests = words.flatMap((word) => {
     const params = freetextRequestParams(word);
-    return params && { view, params, freetext: true };
+    if (!params) {
+      return [];
+    }
+    const result = [{ view, params, freetext: true }];
+
+    if (filters.settings && PHONE_REGEX.test(word) && !word.startsWith('+')) {
+      const normalized = phoneNumber.normalize(filters.settings, word);
+      const stripped = normalized && normalized.replace(/^\+/, '');
+      if (stripped && stripped !== word) {
+        const normalizedParams = freetextRequestParams(stripped);
+        if (normalizedParams) {
+          result.push({ view, params: normalizedParams, freetext: true });
+        }
+      }
+    }
+
+    return result;
   });
   return _.compact(requests);
 };

@@ -497,7 +497,9 @@ describe('Android App Launcher Widget', () => {
       window.CHTCore.AndroidAppLauncher.launchAndroidApp.resolves({
         first_name: 'Jack',
         my_colors: ['blue', 'red', 'green'],
-        my_scores: [10, 20, 30]
+        my_group: {
+          my_scores: [10, 20, 30]
+        }
       });
 
       const appSettings = createFields({
@@ -512,6 +514,14 @@ describe('Android App Launcher Widget', () => {
           '/main/app/outputs/my_scores': ''
         }
       );
+      const $myGroup = createGroup(
+        'or-appearance-android-app-object',
+        '/main/app/outputs/my_group',
+        {
+          '/main/app/outputs/my_group/my_scores': '',
+        }
+      );
+      $outputs.append($myGroup);
 
       $widget
         .append(appSettings)
@@ -523,7 +533,7 @@ describe('Android App Launcher Widget', () => {
       expect(window.CHTCore.AndroidAppLauncher.launchAndroidApp.callCount).to.equal(1);
       expect($widget.find('input[name="/main/app/outputs/first_name"]').val()).to.equal('Jack');
       expect($widget.find('input[name="/main/app/outputs/my_colors"]').val()).to.equal('blue red green');
-      expect($widget.find('input[name="/main/app/outputs/my_scores"]').val()).to.equal('10 20 30');
+      expect($widget.find('input[name="/main/app/outputs/my_group/my_scores"]').val()).to.equal('10 20 30');
     });
 
     it('should set outputs with array of objects', async () => {

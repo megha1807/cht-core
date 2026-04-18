@@ -217,7 +217,7 @@ describe('About Component', () => {
     expect(component.appVersion).to.equal('4.5.0');
     expect(component.version).to.equal('4.5.0');
     expect(component.versionMismatch).to.be.false;
-     expect(consoleErrorMock.notCalled).to.be.true;
+    expect(consoleErrorMock.notCalled).to.be.true;
   }));
 
   it('should handle failure to get service worker app version', fakeAsync(() => {

@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { expect } from 'chai';
 import sinon from 'sinon';
+import { NgIf } from '@angular/common';
 
 import { AboutComponent } from '@mm-modules/about/about.component';
 import { ToolBarComponent } from '@mm-components/tool-bar/tool-bar.component';
@@ -64,6 +65,7 @@ describe('About Component', () => {
           RouterTestingModule,
           MatCardModule,
           MatIcon,
+          NgIf,
           AboutComponent,
           ToolBarComponent,
           NavigationComponent,

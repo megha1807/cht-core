@@ -25,9 +25,9 @@
           </div>
 
           <div *ngIf="versionMismatch">
-            <span translate>app.version</span>
-            <p test-id="about-app-version" class="version-mismatch-warning">{{appVersion}}</p>
-            <p class="version-mismatch-warning" translate>app.version.mismatch</p>
+            <label translate>app.version</label>
+            <p test-id="about-app-version">{{appVersion}}</p>
+            <div class="alert alert-warning" translate>app.version.mismatch</div>
           </div>
 
           <div>

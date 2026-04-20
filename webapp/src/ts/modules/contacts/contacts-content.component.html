@@ -47,14 +47,14 @@
           <div *ngFor="let card of summaryCards">
             <div class="card compact-card" [attr.test-id]="card.label">
               <button
-              type="button"
-              class="action-header cell"
-              (click)="card.collapsed = !card.collapsed"
-              [attr.aria-expanded]="!card.collapsed"
+                type="button"
+                class="action-header cell"
+                (click)="card.collapsed = !card.collapsed"
+                [attr.aria-expanded]="!card.collapsed"
               >
                 <h3>{{card.label | translate}}</h3>
-                 <i class="fa" [ngClass]="card.collapsed ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
-            </button>
+                <i class="fa" [ngClass]="card.collapsed ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+              </button>
               <div class="row flex grid" *ngIf="!card.collapsed">
                 <div class="col col-xs-12 col-sm-{{field.width || 12}}" *ngFor="let field of card.fields">
                   <div class="cell">

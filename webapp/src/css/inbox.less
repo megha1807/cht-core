@@ -649,7 +649,9 @@ mm-analytics-filters {
     }
   }
 
-  .compact-card .action-header { 
+  .compact-card  { 
+    & > .card-body > button.action-header,
+    & button.action-header {
     background: none;
     border: none;
     padding: 0;
@@ -659,17 +661,14 @@ mm-analytics-filters {
     font: inherit;
     color: inherit;
     cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    overflow: hidden;
+    overflow: auto;
 
     &:hover {
       background-color: rgba(0, 0, 0, 0.04);
     }
 
     h3 {
-      float: none;
+      float: left;
       margin: 0;
     }
 
@@ -678,9 +677,10 @@ mm-analytics-filters {
       font-size: 14px;
       color: #555;
       margin-left: 8px;
-      flex-shrink: 0;
+      float: right;
     }
   }
+}
 
   .card.children .content-row.muted h4 {
     color: @inactive-color;

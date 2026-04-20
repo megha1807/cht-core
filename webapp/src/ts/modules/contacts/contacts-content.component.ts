@@ -156,30 +156,6 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
     await this.searchTelemetryService.recordContactSearch(nextSelectedContact.doc, nextFilters.search);
   }
 
-  // Initialize collapsed state for each card — only true if explicitly set to true in config
-  private initializeCards(cards: any[] = []) {
-    return cards.map(card => ({
-      ...card,
-      collapsed: card.collapsed === true
-    }));
-  }
-
-  // Always re-initialize cards collapsed state from the incoming contact object.
-  // The collapsed state is stored directly on the card object in the DOM (via click handler),
-  // so the store always has the original config values — we can safely re-init each time.
-  private withInitializedCards(contact) {
-    if (!contact?.summary?.cards) {
-      return contact;
-    }
-    return {
-      ...contact,
-      summary: {
-        ...contact.summary,
-        cards: this.initializeCards(contact.summary.cards)
-      }
-    };
-  }
-
   private subscribeToStore() {
     const reduxSubscription = combineLatest([
       this.store.select(Selectors.getSelectedContact),

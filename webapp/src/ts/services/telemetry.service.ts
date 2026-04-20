@@ -218,19 +218,11 @@ export class TelemetryService {
   }
 
   private async storeIt(db, key, value) {
-    try {
-      return await db.post({
-        key: key,
-        value: value,
-        date_recorded: Date.now(),
-      });
-    } catch (error) {
-      if (error?.name === 'InvalidStateError' || error?.message?.includes('IDBRequest')) {
-        console.warn('Telemetry storeIt skipped due to IDB state error', error);
-        return;
-      }
-      throw error;
-    }
+    return await db.post({
+      key: key,
+      value: value,
+      date_recorded: Date.now(),
+    });
   }
 
   private async submitIfNeeded(today: TodayMoment, telemetryDBs: string[] = []) {

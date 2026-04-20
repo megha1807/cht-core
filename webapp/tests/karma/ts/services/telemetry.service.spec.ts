@@ -436,18 +436,6 @@ describe('TelemetryService', () => {
       expect(consoleErrorSpy.notCalled).to.be.true;
     });
 
-    it('should handle InvalidStateError in storeIt gracefully', async () => {
-      const idbError = new Error('Failed to read the result property from IDBRequest');
-      idbError.name = 'InvalidStateError';
-      telemetryDb.post.rejects(idbError);
-      windowMock.indexedDB.databases.resolves([]);
-
-      await service.record('test-key', 1);
-
-      // Should not throw or log an error, just warn
-      expect(consoleErrorSpy.notCalled).to.be.true;
-    });
-
     it('should close db before destroying during aggregation', async () => {
       windowMock.indexedDB.databases.resolves([
         'telemetry-2018-11-09-greg',

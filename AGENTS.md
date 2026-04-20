@@ -21,7 +21,7 @@ Database: CouchDB (run locally via Docker for development).
 
 - **Node.js 22.x** and **npm 10.x** (use `nvm install 22`; Node 22 matches production)
 - **Docker** (required for CouchDB and e2e/integration tests)
-- Python 2.7, `xsltproc`, `jq`, `git`, `make`, `g++` (Linux/macOS)
+- `xsltproc`, `jq`, `git`, `make`, `g++` (Linux/macOS)
 
 ### Clone & install
 
@@ -193,7 +193,7 @@ cht-core/
 
 - JavaScript (CommonJS) for `api/`, `sentinel/`, `admin/`; TypeScript for `webapp/` and newer shared-libs
 - ESLint enforced — run `npm run lint` before committing; fix all errors
-- 2-space indentation, single quotes, semicolons required (see root `.eslintrc`)
+- 2-space indentation, single quotes, semicolons required (see root `eslint.config.js`)
 - Strict equality (`===`) throughout
 
 ### Commit format
@@ -201,14 +201,11 @@ cht-core/
 Conventional Commits are used and enforced by CI:
 
 ```
-feat(component): short description
-fix(component): short description
-chore(component): short description
-test(component): short description
+feat(#1234): short description
+fix(#1234): short description
+chore(#1234): short description
+test(#1234): short description
 ```
-
-Reference the GitHub issue number in the commit or PR (e.g. `fix(api): handle null contact #1234`).
-
 ### Branching
 
 - Branch off `master`; open PRs against `master`
@@ -225,7 +222,7 @@ Reference the GitHub issue number in the commit or PR (e.g. `fix(api): handle nu
 
 ## CI
 
-GitHub Actions runs on Node 20, 22, and 24. The main CI pipeline runs:
+GitHub Actions runs on Node 22.15. The main CI pipeline runs:
 
 1. `npm run lint`
 2. `npm run unit`

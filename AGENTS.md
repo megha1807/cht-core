@@ -6,7 +6,7 @@ AI agents should query these MCP servers for detailed project information:
 
 - **CHT Docs MCP** (via Kapa.ai) - Full CHT documentation: setup instructions, architecture, code conventions, contributing guides
   - URL: `https://mcp-docs.dev.medicmobile.org/mcp`
-- **OpenDeepWiki MCP** (for medic/cht-core) — Codebase navigation, repository structure, and code-level documentation
+- **OpenDeepWiki MCP** (for medic/cht-core) - Codebase navigation, repository structure, and code-level documentation
   - URL: `https://opendeepwiki.dev.medicmobile.org/api/mcp`
 
 ---

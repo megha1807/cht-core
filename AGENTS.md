@@ -1,5 +1,16 @@
 # AGENTS.md — CHT Core Quick Reference
 
+## MCP Servers
+
+AI agents should query these MCP servers for detailed project information:
+
+- **CHT Docs MCP** (via Kapa.ai) - Full CHT documentation: setup instructions, architecture, code conventions, contributing guides
+  - URL: `https://mcp-docs.dev.medicmobile.org/mcp`
+- **OpenDeepWiki MCP** (for medic/cht-core) — Codebase navigation, repository structure, and code-level documentation
+  - URL: `https://opendeepwiki.dev.medicmobile.org/api/mcp`
+
+---
+
 ## Monorepo Structure
 
 - **`api/`** — Node.js server providing REST APIs, security, and filtered CouchDB replication
@@ -11,7 +22,23 @@
 - **`tests/`** — Integration and e2e tests that run against a live CHT instance
 - **`scripts/`** — Build, CI, and deployment helper scripts
 
-For full project overview, architecture, and setup instructions, see the [CHT Docs](https://docs.communityhealthtoolkit.org) or query the **CHT Docs MCP** (via Kapa.ai).
+---
+
+## Architecture Overview
+
+NGINX proxies requests to the API service, which connects to CouchDB via HAProxy. Sentinel runs as a background service processing every CouchDB document change. The Webapp uses PouchDB for offline-first sync with CouchDB.
+
+For full architecture details, query the CHT Docs MCP or see https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-core/
+
+---
+
+## Dev Environment Setup
+
+- **Node.js 22.x**, **npm 10.x**, **Docker**, `xsltproc`, `jq`, `git`, `make`, `g++`
+- Set env vars: `COUCH_NODE_NAME=nonode@nohost` and `COUCH_URL=http://medic:password@localhost:5984/medic`
+- Start CouchDB via Docker, then run 3 terminals: `npm run build-dev-watch`, `npm run dev-api`, `npm run dev-sentinel`
+
+For full setup instructions, query the CHT Docs MCP or see https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/
 
 ---
 
@@ -22,6 +49,17 @@ For full project overview, architecture, and setup instructions, see the [CHT Do
 - **New shared functionality** used by multiple services → `shared-libs/`
 - **New e2e tests** → `tests/e2e/default/`
 - **New integration tests** → `tests/integration/`
+
+---
+
+## Code Style & Conventions
+
+- TypeScript for `webapp/` and newer shared-libs; JavaScript (CommonJS) for `api/`, `sentinel/`, `admin/`
+- 2-space indentation, single quotes, semicolons required
+- `const`/`let` only (never `var`); strict equality (`===`) throughout
+- `lowerCamelCase` for functions, `ALL_UPPERCASE` for constants, `snake_case` for CouchDB properties
+
+For full style guide, query the CHT Docs MCP or see https://docs.communityhealthtoolkit.org/community/contributing/code/style-guide/
 
 ---
 
@@ -86,6 +124,25 @@ npm run test-config-default    # runs tests in config/default/
 
 ---
 
+## Testing Conventions
+
+- Mocha + Chai + Sinon for `api/` and `sentinel/` tests; Karma for `webapp/` and `admin/`
+- WebdriverIO + Page Object pattern for e2e tests
+- Test files named `*.spec.js` or `*.spec.ts`; call `sinon.restore()` in `afterEach`
+- Unit tests must not require a running CouchDB or CHT instance (`UNIT_TEST_ENV=1` stubs external calls)
+
+For full testing guide, query the CHT Docs MCP or see https://docs.communityhealthtoolkit.org/community/contributing/code/core/automated-tests/ and https://docs.communityhealthtoolkit.org/community/contributing/code/core/style-guide-automated-e2e-tests/
+
+---
+
+## Static Analysis
+
+ESLint (flat config at `eslint.config.js`) and SonarCloud both gate PRs. Run `npm run lint` before every commit.
+
+For details, query the CHT Docs MCP or see https://docs.communityhealthtoolkit.org/community/contributing/code/static-analysis/
+
+---
+
 ## Commit Format
 
 Conventional Commits are used and enforced by CI:
@@ -116,6 +173,17 @@ E2e and full integration tests run on separate CI jobs (require Docker image bui
 
 ---
 
+## PR Workflow
+
+- PR title must match the Conventional Commits format
+- Squash and merge by default
+- Use draft PRs for early collaboration
+- Self-review before requesting reviewers
+
+For full workflow details, query the CHT Docs MCP or see https://docs.communityhealthtoolkit.org/community/contributing/code/workflow/
+
+---
+
 ## Key Environment Variables
 
 | Variable | Required | Default | Description |
@@ -124,12 +192,3 @@ E2e and full integration tests run on separate CI jobs (require Docker image bui
 | `COUCH_NODE_NAME` | Yes | — | CouchDB node name e.g. `nonode@nohost` |
 | `API_PORT` | No | `5988` | Port the API listens on |
 | `CHROME_BIN` | No | — | Path to Chrome binary (needed for some test environments) |
-
----
-
-## MCP Servers
-
-AI agents can query these MCP servers for up-to-date project information instead of relying solely on this file:
-
-- **CHT Docs MCP** (via Kapa.ai) — Full CHT documentation: setup instructions, architecture, code conventions, contributing guides
-- **OpenDeepWiki MCP** (for medic/cht-core) — Codebase navigation, repository structure, and code-level documentation

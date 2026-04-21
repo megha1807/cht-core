@@ -103,7 +103,7 @@ const getNormalizedPhoneRequest = (word, settings, view) => {
     return null;
   }
   const normalized = phoneNumber.normalize(settings, word);
-  const stripped = normalized?.replace(/^\+/, '');
+  const stripped = typeof normalized === 'string' ? normalized.replace(/^\+/, '') : null;
   if (!stripped || stripped === word) {
     return null;
   }

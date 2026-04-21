@@ -14,3 +14,29 @@
 @import "widgets";
 @import "../../../node_modules/enketo-core/src/sass/core/responsive";
 @import "../../../node_modules/enketo-core/src/sass/formhub/main";
+
+/** guidance hints **/
+.or-form-guidance {
+  summary {
+    cursor: pointer;
+    color: $brand-primary-color;
+    font-size: 11px;
+    font-style: italic;
+    padding: 3px 0;
+    user-select: none;
+
+    &::-webkit-details-marker {
+      color: $brand-primary-color;
+    }
+  }
+
+  &.active {
+    background-color: lighten($brand-primary-color, 50%);
+    border-left: 3px solid $brand-primary-color;
+    border-radius: 2px;
+    padding: 6px 10px;
+    margin: 5px 0;
+    font-size: 12px;
+    color: #555555;
+  }
+}

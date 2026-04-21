@@ -3,7 +3,6 @@ const moment = require('moment');
 
 const MINIMUM_SEARCH_TERM_LENGTH = 3;
 const phoneNumber = require('@medic/phone-number');
-const PHONE_REGEX = /^\+?[\d\s\-().]{7,}$/;
 
 const getKeysArray = (keys) => keys.map(key => [ key ]);
 
@@ -100,7 +99,7 @@ const getNormalizedPhoneRequest = (word, settings, view) => {
   if (!settings?.default_country_code) {
     return null;
   }
-  if (!PHONE_REGEX.test(word) || word.startsWith('+')) {
+  if (word.startsWith('+')) {
     return null;
   }
   const normalized = phoneNumber.normalize(settings, word);

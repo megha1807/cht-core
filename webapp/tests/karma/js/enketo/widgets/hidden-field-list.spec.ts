@@ -45,9 +45,11 @@ describe('HiddenFieldList Widget', () => {
   describe('_init', () => {
     it('adds disabled class to field-list group with hidden appearance', () => {
       buildHtml(`
-        <div class="or-appearance-field-list or-appearance-hidden">
-          <div class="question or-appearance-hidden"></div>
-        </div>
+        <form class="or">
+          <div class="or-appearance-field-list or-appearance-hidden">
+            <div class="question or-appearance-hidden"></div>
+          </div>
+        </form>
       `);
       const el = document.querySelector(HiddenFieldList.selector) as HTMLElement;
       new HiddenFieldList(el, {});
@@ -56,9 +58,11 @@ describe('HiddenFieldList Widget', () => {
 
     it('preserves existing classes when adding disabled', () => {
       buildHtml(`
-        <div class="or-appearance-field-list or-appearance-hidden">
-          <div class="question or-appearance-hidden"></div>
-        </div>
+        <form class="or">
+          <div class="or-appearance-field-list or-appearance-hidden">
+            <div class="question or-appearance-hidden"></div>
+          </div>
+        </form>
       `);
       const el = document.querySelector(HiddenFieldList.selector) as HTMLElement;
       new HiddenFieldList(el, {});

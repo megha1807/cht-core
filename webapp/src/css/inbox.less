@@ -650,37 +650,38 @@ mm-analytics-filters {
   }
 
   .compact-card  { 
-    & > .card-body > button.action-header,
-    & button.action-header {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    text-align: left;
-    font: inherit;
-    color: inherit;
-    cursor: pointer;
-    overflow: auto;
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
-    }
-
-    h3 {
-      float: left;
+    &:not(.children):not(.tasks):not(.reports) button.action-header {
+      background: none;
+      border: none;
+      border-bottom: 3px solid @separator-color;
+      padding: 0;
       margin: 0;
-    }
-
-    .fa-chevron-right,
-    .fa-chevron-down {
-      font-size: 14px;
-      color: #555;
-      margin-left: 8px;
-      float: right;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      overflow: auto;
+      display: block;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+      h3 {
+        float: left;
+        margin: 0;
+        font-weight: normal;
+        padding: 6px 0;
+      }
+      .fa-chevron-right,
+      .fa-chevron-down {
+        font-size: 14px;
+        color: #555;
+        margin-left: 8px;
+        float: right;
+        margin-top: 10px;
+      }
     }
   }
-}
 
   .card.children .content-row.muted h4 {
     color: @inactive-color;

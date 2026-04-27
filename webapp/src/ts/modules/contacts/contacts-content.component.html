@@ -53,7 +53,7 @@
                 [attr.aria-expanded]="!card.collapsed"
               >
                 <h3>{{card.label | translate}}</h3>
-                <i class="fa" [ngClass]="card.collapsed ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+                <i class="fa" [ngClass]="card.collapsed ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
               </button>
               <div class="row flex grid" *ngIf="!card.collapsed">
                 <div class="col col-xs-12 col-sm-{{field.width || 12}}" *ngFor="let field of card.fields">

@@ -198,25 +198,29 @@ describe('Contact details page.', () => {
       await commonPage.goToPeople(patient._id);
       await contactPage.waitForContactLoaded();
 
-      const cardHeader = await $('.compact-card .action-header');
-      const cardFields = await $('.compact-card .row.flex.grid');
+      const firstCardSelectors = contactPage.contactSummaryCardSelectors('first.card');
+      const firstCardHeader = firstCardSelectors.header();
+      const firstCardField = firstCardSelectors.fieldValue('first.field');
+      const secondCardSelectors = contactPage.contactSummaryCardSelectors('second.card');
+      const secondCardHeader = secondCardSelectors.header();
+      const secondCardField = secondCardSelectors.fieldValue('second.field');
 
-      await cardFields.waitForDisplayed({ timeout: 10000 });
-      
-      expect(await cardFields.isDisplayed()).to.be.true;
-      expect(await cardHeader.getAttribute('aria-expanded')).to.equal('true');
+      await firstCardHeader.waitForDisplayed();
+      await secondCardHeader.waitForDisplayed();
+      // First card expanded
+      await firstCardField.waitForDisplayed();
+      // Second card collapsed
+      await secondCardField.waitForDisplayed({ reverse: true });
 
-      
-      await cardHeader.click();
-      await cardFields.waitForDisplayed({ timeout: 5000, reverse: true });
-      expect(await cardFields.isDisplayed()).to.be.false;
-      expect(await cardHeader.getAttribute('aria-expanded')).to.equal('false');
+      await firstCardHeader.click();
 
-      
-      await cardHeader.click();
-      await cardFields.waitForDisplayed({ timeout: 5000 });
-      expect(await cardFields.isDisplayed()).to.be.true;
-      expect(await cardHeader.getAttribute('aria-expanded')).to.equal('true');
+      await firstCardField.waitForDisplayed({ reverse: true });
+      await secondCardField.waitForDisplayed({ reverse: true });
+
+      await secondCardHeader.click();
+
+      await firstCardField.waitForDisplayed({ reverse: true });
+      await secondCardField.waitForDisplayed();
     });
   });
 });

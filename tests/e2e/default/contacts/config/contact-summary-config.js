@@ -2,14 +2,20 @@ const context = {};
 
 const cards = [
   {
-    label: 'test.card',
-    fields: [
-      {
-        label: 'test.field',
-        value: 'Test Value',
-        width: 6
-      }
-    ]
+    label: 'first.card',
+    collapsed: false,
+    fields: [{
+      label: 'first.field',
+      value: 'Test Value 1'
+    }]
+  },
+  {
+    label: 'second.card',
+    collapsed: true,
+    fields: [{
+      label: 'second.field',
+      value: 'Test Value 2'
+    }]
   }
 ];
 

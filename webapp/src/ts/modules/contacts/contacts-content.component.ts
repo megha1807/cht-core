@@ -213,14 +213,6 @@ export class ContactsContentComponent implements OnInit, OnDestroy {
           this.summaryErrorStack = summary.errorStack;
           return;
         }
-        this.selectedContact = {
-          ...this.selectedContact,
-          summary
-        };
-        this.summaryCards = (summary.cards ?? []).map(card => ({ 
-          ...card,
-          collapsed: card.collapsed === true
-        }));
         this.subscribeToSelectedContactXmlForms();
       });
     this.subscriptions.add(contactSummarySubscription);

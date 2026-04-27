@@ -426,6 +426,7 @@ describe('Contacts content component', () => {
     it('should default to expanded when collapsed is undefined', () => {
       const compiled = fixture.nativeElement;
       expect(compiled.querySelector('.card.compact-card .row.flex.grid')).to.exist;
+      expect(compiled.querySelector('.action-header').getAttribute('aria-expanded')).to.equal('true');
     });
 
     it('should start collapsed when collapsed: true is set in config', () => {
@@ -439,6 +440,7 @@ describe('Contacts content component', () => {
 
       const compiled = fixture.nativeElement;
       expect(compiled.querySelector('.card.compact-card .row.flex.grid')).to.not.exist;
+      expect(compiled.querySelector('.action-header').getAttribute('aria-expanded')).to.equal('false');
     });
 
     it('should toggle collapsed state when header is clicked', () => {
@@ -449,24 +451,13 @@ describe('Contacts content component', () => {
       header.click();
       fixture.detectChanges();
       expect(compiled.querySelector('.card.compact-card .row.flex.grid')).to.not.exist;
+      expect(compiled.querySelector('.action-header').getAttribute('aria-expanded')).to.equal('false');
 
       // click to expand
       header.click();
       fixture.detectChanges();
       expect(compiled.querySelector('.card.compact-card .row.flex.grid')).to.exist;
-    });
-
-    it('should reflect aria-expanded correctly', () => {
-      const compiled = fixture.nativeElement;
-      const header = compiled.querySelector('.action-header');
-
-      // expanded by default
-      expect(header.getAttribute('aria-expanded')).to.equal('true');
-
-      // collapsed after click
-      header.click();
-      fixture.detectChanges();
-      expect(header.getAttribute('aria-expanded')).to.equal('false');
+      expect(compiled.querySelector('.action-header').getAttribute('aria-expanded')).to.equal('true');
     });
 
     it('should reset collapsed state when selected contact changes', () => {
@@ -480,13 +471,9 @@ describe('Contacts content component', () => {
 
       // change selected contact - new object resets state
       store.overrideSelector(Selectors.getSelectedContact, {
+        ...selectedContact,
         _id: 'new-contact',
-        doc: {},
-        type: {},
-        summary: { cards: [{ label: 'test-card', fields: [] }] },
-        children: [],
-        tasks: [],
-        reports: []
+        summary: cardSummary
       });
       store.refreshState();
       fixture.detectChanges();

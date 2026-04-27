@@ -95,20 +95,18 @@ const freetextRequestParams = (word) => {
   return params;
 };
 
-const getNormalizedPhoneRequest = (word, settings, view) => {
-  if (!settings?.default_country_code) {
-    return null;
-  }
-  if (word.startsWith('+')) {
+const getNormalizedPhone = (word, settings) => {
+  if (!settings?.default_country_code || word.startsWith('+')) {
     return null;
   }
   const normalized = phoneNumber.normalize(settings, word);
-  const stripped = typeof normalized === 'string' ? normalized.replace(/^\+/, '') : null;
-  if (!stripped || stripped === word) {
+   if (typeof normalized !== 'string') {
     return null;
   }
-  const normalizedParams = freetextRequestParams(stripped);
-  return normalizedParams ? { view, params: normalizedParams, freetext: true } : null;
+   if (normalized.replace(/^\+/, '') === word) {
+    return null;
+  }
+  return normalized;
 };
 
 const freetextRequest = (filters, view) => {
@@ -120,16 +118,13 @@ const freetextRequest = (filters, view) => {
     .toLowerCase()
     .split(/\s+/);
   const requests = words.flatMap((word) => {
-    const params = freetextRequestParams(word);
+    const normalizedPhone = getNormalizedPhone(word, filters.settings);
+    const searchWord = normalizedPhone || word;
+    const params = freetextRequestParams(searchWord);
     if (!params) {
       return [];
     }
-    const result = [{ view, params, freetext: true }];
-    const phoneRequest = getNormalizedPhoneRequest(word, filters.settings, view);
-    if (phoneRequest) {
-      result.push(phoneRequest);
-    }
-    return result;
+    return [{ view, params, freetext: true }];
   });
   return _.compact(requests);
 };

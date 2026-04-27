@@ -100,10 +100,10 @@ const getNormalizedPhone = (word, settings) => {
     return null;
   }
   const normalized = phoneNumber.normalize(settings, word);
-   if (typeof normalized !== 'string') {
+  if (typeof normalized !== 'string') {
     return null;
   }
-   if (normalized.replace(/^\+/, '') === word) {
+  if (normalized.replace(/^\+/, '') === word) {
     return null;
   }
   return normalized;

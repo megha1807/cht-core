@@ -25,7 +25,9 @@ describe('cht-form web component - Guidance Hints', () => {
     expect(await guidanceToggle.getAttribute('open')).to.be.null;
     await summary.click();
     expect(await guidanceToggle.getAttribute('open')).to.not.be.null;
-    expect(await commonEnketoPage.isElementDisplayed('span', 'Guidance hint')).to.be.true;
+    // Check guidance content is visible inside the open details element
+    const guidanceContent = await guidanceToggle.$('.or-form-guidance-contents');
+    expect(await guidanceContent.isDisplayed()).to.be.true;
   });
 
   it('should render markdown in guidance hint', async () => {

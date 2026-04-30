@@ -141,7 +141,7 @@ const replaceAllMarkdown = (form) => {
 
   // Now render markdown
   const questions = form.querySelectorAll('span.question-label');
-  const hints = form.querySelectorAll('span.or-hint');
+  const hints = form.querySelectorAll('span.or-hint, details.or-hint');
   questions.concat(hints).forEach((el, index) => {
     const original = el.innerHTML;
     let rendered = markdown.toHtml(original);

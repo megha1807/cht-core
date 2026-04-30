@@ -1,0 +1,46 @@
+const mockConfig = require('../mock-config');
+const genericForm = require('@page-objects/default/enketo/generic-form.wdio.page');
+const commonEnketoPage = require('@page-objects/default/enketo/common-enketo.wdio.page');
+
+describe('cht-form web component - Guidance Hints', () => {
+
+  beforeEach(async () => {
+    await mockConfig.loadForm('default', 'test', 'guidance_hints');
+  });
+
+  it('should display the form title', async () => {
+    const title = await genericForm.getFormTitle();
+    expect(title).to.equal('Guidance Hints');
+  });
+
+  it('should show guidance hint toggle for question with guidance', async () => {
+    const guidanceToggle = await $('details.or-hint.guidance');
+    expect(await guidanceToggle.isExisting()).to.be.true;
+    expect(await guidanceToggle.isDisplayed()).to.be.true;
+  });
+
+  it('should expand and show guidance hint text when clicked', async () => {
+    const guidanceToggle = await $('details.or-hint.guidance');
+    const summary = await guidanceToggle.$('summary');
+    expect(await guidanceToggle.getAttribute('open')).to.be.null;
+    await summary.click();
+    expect(await guidanceToggle.getAttribute('open')).to.not.be.null;
+    expect(await commonEnketoPage.isElementDisplayed('span', 'Guidance hint')).to.be.true;
+  });
+
+  it('should render markdown in guidance hint', async () => {
+    const guidanceToggles = await $$('details.or-hint.guidance');
+    expect(guidanceToggles.length).to.be.at.least(1);
+    const secondGuidance = guidanceToggles[1];
+    await (await secondGuidance.$('summary')).click();
+    const heading = await secondGuidance.$('h3');
+    expect(await heading.isExisting()).to.be.true;
+  });
+
+  it('should submit the form successfully', async () => {
+    await commonEnketoPage.setInputValue('Question Label', 'test answer');
+    const [doc] = await mockConfig.submitForm();
+    expect(doc.fields.page.text).to.equal('test answer');
+  });
+
+});

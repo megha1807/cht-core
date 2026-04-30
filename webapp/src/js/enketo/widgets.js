@@ -31,7 +31,7 @@
     require( './widgets/display-base64-image' ),
     require( './widgets/dynamic-url' ),
     require( './widgets/draw' ),
-    require( './widgets/hidden-field-list' ),
+    require( './widgets/hidden-group' ),
   ];
 
   module.exports = widgets;

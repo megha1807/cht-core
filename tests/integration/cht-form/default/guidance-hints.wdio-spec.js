@@ -14,13 +14,13 @@ describe('cht-form web component - Guidance Hints', () => {
   });
 
   it('should show guidance hint toggle for question with guidance', async () => {
-    const guidanceToggle = await $('details.or-hint.guidance');
+    const guidanceToggle = await $('details.or-form-guidance');
     expect(await guidanceToggle.isExisting()).to.be.true;
     expect(await guidanceToggle.isDisplayed()).to.be.true;
   });
 
   it('should expand and show guidance hint text when clicked', async () => {
-    const guidanceToggle = await $('details.or-hint.guidance');
+    const guidanceToggle = await $('details.or-form-guidance');
     const summary = await guidanceToggle.$('summary');
     expect(await guidanceToggle.getAttribute('open')).to.be.null;
     await summary.click();
@@ -29,7 +29,7 @@ describe('cht-form web component - Guidance Hints', () => {
   });
 
   it('should render markdown in guidance hint', async () => {
-    const guidanceToggles = await $$('details.or-hint.guidance');
+    const guidanceToggles = await $$('details.or-form-guidance');
     expect(guidanceToggles.length).to.be.at.least(1);
     const secondGuidance = guidanceToggles[1];
     await (await secondGuidance.$('summary')).click();

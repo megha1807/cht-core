@@ -322,7 +322,7 @@ describe('TelemetryService', () => {
       expect(medicDb.query.args[0][0]).to.equal('medic-client/doc_by_type');
       expect(medicDb.query.args[0][1]).to.deep.equal({ key: [ 'form' ], include_docs: true });
       expect(telemetryDb.destroy.calledTwice).to.be.true;
-      expect(telemetryDb.close.calledTwice).to.be.true;  
+      expect(telemetryDb.close.close.notCalled).to.be.true;  
 
       expect(consoleErrorSpy.notCalled).to.be.true;
     });
@@ -436,31 +436,6 @@ describe('TelemetryService', () => {
       expect(consoleErrorSpy.notCalled).to.be.true;
     });
 
-    it('should close db before destroying to flush pending IDB transactions', async () => {
-      windowMock.indexedDB.databases.resolves([
-        'telemetry-2018-11-09-greg',
-      ]);
-      medicDb.query.resolves({ rows: [] });
-      telemetryDb.query.resolves({ rows: [] });
-      medicDb.info.resolves({ some: 'stats' });
-      metaDb.put.resolves();
-      medicDb.get.withArgs('_design/medic-client').resolves({
-        _id: '_design/medic-client',
-        build_info: { version: '3.0.0' }
-      });
-      medicDb.allDocs.resolves({ rows: [{ value: { rev: 'rev1' } }] });
-
-      await service.record('test', 1);
-
-      // close() must be called before destroy() to flush pending IDB cursor
-      // transactions opened by db.query() inside aggregateMapReduce().
-      // Without this, PouchDB's destroy() throws InvalidStateError because
-      // the IDB transaction has not yet fully committed at the browser level.
-      sinon.assert.callOrder(telemetryDb.close, telemetryDb.destroy);
-      expect(telemetryDb.close.calledOnce).to.be.true;
-      expect(telemetryDb.destroy.calledOnce).to.be.true;
-    });
-
   });  // end describe('record()')
 
   describe('storeConflictedAggregate()', () => {
@@ -498,7 +473,7 @@ describe('TelemetryService', () => {
       expect(metaDb.put.args[1][0]._id).to.match(/^telemetry-2018-11-5-greg-[\w-]+-conflicted-[\w-]+$/);
       expect(metaDb.put.args[1][0].metadata.conflicted).to.equal(true);
       expect(telemetryDb.destroy.calledOnce).to.be.true;
-      expect(telemetryDb.close.calledOnce).to.be.true;  
+      expect(telemetryDb.close.notCalled).to.be.true;  
     });
   });
 

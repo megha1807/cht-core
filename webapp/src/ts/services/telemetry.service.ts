@@ -248,7 +248,6 @@ export class TelemetryService {
           try {
             db = this.windowRef.PouchDB(dbName);
             await this.aggregate(db, dbName);
-            await db.close();
             await db.destroy();
           } catch (error) {
             console.error('Error when aggregating the telemetry records', error);

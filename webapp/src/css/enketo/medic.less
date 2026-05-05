@@ -485,35 +485,26 @@
 
   // New general-purpose background color appearances for any question type (issue #9893)
   // Unlike the existing color appearances, these work on all question types, not just summary notes
+  // Supported on both individual questions and group/section blocks
   .or-appearance-background-red {
-    background-color: #e00900;
-    color: #fff;
-    label, legend, .question-label { color: #fff; }
-    input, select, textarea { background-color: #f2a09a; }
+    background-color: @enketo-background-red;
+    &.or-group { padding: 5px 0; }
   }
   .or-appearance-background-green {
-    background-color: #2e7d7d;
-    color: #fff;
-    label, legend, .question-label { color: #fff; }
-    input, select, textarea { background-color: #a8cece; }
+    background-color: @enketo-background-green;
+    &.or-group { padding: 5px 0; }
   }
   .or-appearance-background-blue {
-    background-color: #2c5f9e;
-    color: #fff;
-    label, legend, .question-label { color: #fff; }
-    input, select, textarea { background-color: #a3bee2; }
+    background-color: @enketo-background-blue;
+    &.or-group { padding: 5px 0; }
   }
   .or-appearance-background-yellow {
-    background-color: #e2b100;
-    color: #333;
-    label, legend, .question-label { color: #333; }
-    input, select, textarea { background-color: #f0ca55; }
+    background-color: @enketo-background-yellow;
+    &.or-group { padding: 5px 0; }
   }
   .or-appearance-background-lime {
-    background-color: #b5bd21;
-    color: #333;
-    label, legend, .question-label { color: #333; }
-    input, select, textarea { background-color: #ced467; }
+    background-color: @enketo-background-lime;
+    &.or-group { padding: 5px 0; }
   }
 }
 

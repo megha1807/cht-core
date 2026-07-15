@@ -1,0 +1,158 @@
+const mockConfig = require('../mock-config');
+const genericForm = require('@page-objects/default/enketo/generic-form.wdio.page');
+
+describe('cht-form web component - Bikram Sambat Widget', () => {
+
+  beforeEach(async () => {
+    await mockConfig.loadForm('default', 'test', 'bikram_sambat_widget');
+  });
+
+  it('hides the native date input and configures accessibility attributes', async () => {
+    // There should be two native date inputs hidden from screen readers and keyboard focus
+    const nativeInputs = await $$('input[type="date"]');
+    expect(nativeInputs).to.have.lengthOf(2);
+
+    for (const nativeInput of nativeInputs) {
+      expect(await nativeInput.getAttribute('tabindex')).to.equal('-1');
+      expect(await nativeInput.getAttribute('aria-hidden')).to.equal('true');
+      expect(await nativeInput.hasClass('hidden-for-bikram-sambat-datepicker')).to.be.true;
+    }
+  });
+
+  it('pre-populates manual fields correctly with Devanagari numbers on load', async () => {
+    // The second widget is pre-populated with "2024-06-29" -> 2081-03-15 BS
+    const widgets = await $$('.bikram-sambat-widget');
+    expect(widgets).to.have.lengthOf(2);
+
+    const populatedWidget = widgets[1];
+    const dayVal = await populatedWidget.$('[name="day"]').getValue();
+    const yearVal = await populatedWidget.$('[name="year"]').getValue();
+    const monthText = await populatedWidget.$('.month-dropdown-btn .selected-month-text').getText();
+
+    // Verify Devanagari numbers and month text are correct
+    expect(dayVal).to.equal('१५');
+    expect(monthText).to.equal('असार');
+    expect(yearVal).to.equal('२०८१');
+  });
+
+  it('clears populated values and de-highlights selected day on clear button click', async () => {
+    const widgets = await $$('.bikram-sambat-widget');
+    const populatedWidget = widgets[1];
+
+    // Click the clear button
+    const clearBtn = await populatedWidget.$('.btn-clear');
+    await clearBtn.click();
+
+    // Verify fields are reset
+    const dayVal = await populatedWidget.$('[name="day"]').getValue();
+    const yearVal = await populatedWidget.$('[name="year"]').getValue();
+    const monthText = await populatedWidget.$('.month-dropdown-btn .selected-month-text').getText();
+
+    expect(dayVal).to.equal('');
+    expect(monthText).to.equal('महिना');
+    expect(yearVal).to.equal('');
+  });
+
+  it('configures dialog ARIA attributes and restores focus to calendar button on close', async () => {
+    const widgets = await $$('.bikram-sambat-widget');
+    const firstWidget = widgets[0];
+
+    const calBtn = await firstWidget.$('.btn-nepali-calendar');
+    await calBtn.click();
+
+    // Verify picker is open and dialog ARIA properties are set
+    const picker = await $('.nepali-date-picker');
+    expect(await picker.isDisplayed()).to.be.true;
+    expect(await picker.getAttribute('role')).to.equal('dialog');
+    expect(await picker.getAttribute('aria-modal')).to.equal('true');
+
+    // Click close button inside the picker
+    const closeBtn = await picker.$('.btn-close');
+    await closeBtn.click();
+
+    // Verify picker is closed
+    expect(await picker.isDisplayed()).to.be.false;
+
+    // Focus should be restored back to the calendar button
+    const isFocused = await browser.execute((btn) => document.activeElement === btn, calBtn);
+    expect(isFocused).to.be.true;
+  });
+
+  it('traps keyboard focus (Tab / Shift+Tab) inside the calendar picker dialog', async () => {
+    const widgets = await $$('.bikram-sambat-widget');
+    const firstWidget = widgets[0];
+
+    const calBtn = await firstWidget.$('.btn-nepali-calendar');
+    await calBtn.click();
+
+    const picker = await $('.nepali-date-picker');
+    
+    // Find all focusable elements inside picker
+    const selector = 'button, select, input, a, [tabindex]:not([tabindex="-1"])';
+    const focusable = await picker.$$(selector);
+    expect(focusable.length).to.be.greaterThan(1);
+
+    const firstEl = focusable[0];
+    const lastEl = focusable[focusable.length - 1];
+
+    // Focus the first element, send Shift+Tab, verify focus wraps to the last element
+    await browser.execute((el) => el.focus(), firstEl);
+    await browser.keys(['Shift', 'Tab']);
+    const wrapsToLast = await browser.execute((el) => document.activeElement === el, lastEl);
+    expect(wrapsToLast).to.be.true;
+
+    // Focus the last element, send Tab, verify focus wraps back to the first element
+    await browser.execute((el) => el.focus(), lastEl);
+    await browser.keys(['Tab']);
+    const wrapsToFirst = await browser.execute((el) => document.activeElement === el, firstEl);
+    expect(wrapsToFirst).to.be.true;
+
+    // Close the picker
+    const closeBtn = await picker.$('.btn-close');
+    await closeBtn.click();
+  });
+
+  it('cleans up body-appended picker elements when form is destroyed (cancelForm)', async () => {
+    const widgets = await $$('.bikram-sambat-widget');
+    const firstWidget = widgets[0];
+
+    // Open picker so it gets appended to body
+    const calBtn = await firstWidget.$('.btn-nepali-calendar');
+    await calBtn.click();
+
+    expect(await $('.nepali-date-picker').isExisting()).to.be.true;
+    expect(await $('.nepali-date-picker-overlay').isExisting()).to.be.true;
+
+    // Destroy the form
+    await mockConfig.cancelForm();
+
+    // Verify both are completely cleaned up from body to prevent memory leaks
+    expect(await $('.nepali-date-picker').isExisting()).to.be.false;
+    expect(await $('.nepali-date-picker-overlay').isExisting()).to.be.false;
+  });
+
+  it('sanitizes all href attributes in calendar to prevent XSS javascript injections', async () => {
+    const widgets = await $$('.bikram-sambat-widget');
+    const firstWidget = widgets[0];
+
+    const calBtn = await firstWidget.$('.btn-nepali-calendar');
+    await calBtn.click();
+
+    // Inspect all links inside the picker
+    const picker = await $('.nepali-date-picker');
+    const links = await picker.$$('a');
+    expect(links.length).to.be.greaterThan(0);
+
+    for (const link of links) {
+      const href = await link.getAttribute('href');
+      // No links should use javascript: or arbitrary protocols
+      if (href) {
+        expect(href.trim().toLowerCase().startsWith('javascript:')).to.be.false;
+      }
+    }
+
+    // Close picker
+    const closeBtn = await picker.$('.btn-close');
+    await closeBtn.click();
+  });
+});

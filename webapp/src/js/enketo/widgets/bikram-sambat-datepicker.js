@@ -112,7 +112,9 @@ class Bikramsambatdatepicker extends Widget {
     $('.nepali-date-picker-overlay').remove();
     $('.nepali-date-picker').remove();
     $(document).off('keydown.nepaliDatePicker');
-    super.destroy( element );
+    if (typeof super.destroy === 'function') {
+      super.destroy( element );
+    }
   }
 }
 
